@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>{{ title }} · {{ site.nombre }}</title>
+<meta name="description" content="{{ description }}">
+<link rel="canonical" href="{{ site.url }}/blog/{{ page.fileSlug }}/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
+{% if imagen %}<meta property="og:image" content="{{ site.url }}{{ imagen }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:locale" content="es_ES">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ title }}",
+  "description": "{{ description }}",
+  {% if imagen %}"image": "{{ site.url }}{{ imagen }}",{% endif %}
+  "datePublished": "{{ date | fechaISO }}",
+  "author": { "@type": "Organization", "name": "{{ site.nombre }}" },
+  "publisher": { "@type": "Organization", "name": "{{ site.nombre }}" }
+}
+</script>
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/img/icon-192.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta name="theme-color" content="#072B53">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C2A3E;--ink-soft:#3E5A6E;--brand:#0E5AA7;--brand-deep:#0A3A6E;--brand-darker:#072B53;
+  --fresh:#16C2B0;--fresh-deep:#0E9C8E;--mist:#E9F3FA;--cloud:#F3F8FC;--line:#DCE8F1;
+  --d:Bricolage Grotesque,sans-serif;--b:Hanken Grotesk,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--b);color:var(--ink);line-height:1.7;background:#fff;overflow-x:hidden;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:rgba(14,90,167,.12)}
+img{max-width:100%;display:block}
+a{color:var(--brand);text-decoration:none}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+h1,h2,h3{font-family:var(--d);line-height:1.15;letter-spacing:-.02em}
+
+/* header */
+header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);z-index:10}
+.nav{max-width:1100px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:11px}
+.logo-mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--fresh));display:grid;place-items:center}
+.logo-mark svg{width:23px;height:23px;stroke:#fff;fill:none;stroke-width:2}
+.logo b{font-family:var(--d);font-weight:800;font-size:1.08rem;display:block;line-height:1;color:var(--ink)}
+.logo span{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--fresh-deep);font-weight:600}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{font-family:var(--d);font-weight:500;color:var(--ink-soft);font-size:.95rem}
+.nav-links a:hover{color:var(--brand)}
+.btn{background:var(--fresh);color:#04231f;font-family:var(--d);font-weight:600;padding:10px 20px;border-radius:100px;font-size:.92rem}
+
+/* article */
+.hero{background:var(--cloud);padding:48px 0 40px;border-bottom:1px solid var(--line)}
+.crumbs{font-size:.85rem;color:var(--ink-soft);margin-bottom:14px}
+.crumbs a{color:var(--fresh-deep);font-weight:600}
+.cat{display:inline-block;background:var(--fresh);color:#04231f;font-family:var(--d);font-weight:600;font-size:.78rem;padding:5px 14px;border-radius:100px;margin-bottom:16px}
+.hero h1{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:800;margin-bottom:14px}
+.meta{color:var(--ink-soft);font-size:.92rem}
+.cover{width:100%;aspect-ratio:16/9;object-fit:cover;background:#E9F1F8;border-radius:18px;margin:34px auto 0;display:block;max-width:760px}
+
+article{padding:46px 0 60px}
+article p{margin-bottom:20px;font-size:1.08rem}
+article h2{font-size:1.7rem;margin:38px 0 14px;font-weight:700}
+article h3{font-size:1.3rem;margin:28px 0 10px;font-weight:700}
+article ul,article ol{margin:0 0 22px 24px}
+article li{margin-bottom:9px;font-size:1.08rem}
+article img{max-width:100%;border-radius:14px;margin:24px 0}
+article blockquote{border-left:4px solid var(--fresh);background:var(--cloud);padding:16px 22px;border-radius:0 12px 12px 0;margin:24px 0;color:var(--ink-soft)}
+article a{font-weight:600;text-decoration:underline}
+article strong{color:var(--ink)}
+
+.cta{background:linear-gradient(135deg,var(--brand-deep),var(--brand));border-radius:20px;padding:40px;text-align:center;color:#fff;margin:40px 0}
+.cta h3{font-size:1.5rem;color:#fff;margin-bottom:10px}
+.cta p{color:#d4e6f5;margin-bottom:22px}
+.cta .btn{display:inline-block}
+
+.back{display:inline-flex;align-items:center;gap:8px;font-family:var(--d);font-weight:600;margin-top:10px}
+
+footer{background:var(--brand-darker);color:#9fc1dc;padding:40px 0;text-align:center;font-size:.9rem}
+footer a{color:var(--fresh)}
+footer .ft-top{font-family:var(--d);color:#fff;font-weight:600;margin-bottom:6px}
+
+@media(max-width:600px){
+  .wrap{padding:0 18px}
+  .nav{padding:12px 18px}
+  .nav-links a:not(.btn){display:none}
+  .logo img{height:34px!important}
+  .hero{padding:34px 0 30px}
+  .cover{margin-top:26px;border-radius:14px}
+  article{padding:34px 0 46px}
+  article p,article li{font-size:1.04rem}
+  article h2{font-size:1.42rem;margin:30px 0 12px}
+  article h3{font-size:1.18rem}
+  article ul,article ol{margin-left:20px}
+  .cta{padding:30px 22px;border-radius:18px}
+  .cta h3{font-size:1.28rem}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a class="logo" href="/">
+      <img src="/img/logo-limpiezas-castellon.png" alt="{{ site.nombre }}" width="700" height="288" style="height:40px;width:auto">
+    </a>
+    <nav class="nav-links">
+      <a href="/">Inicio</a>
+      <a href="/blog/">Blog</a>
+      <a href="/#contacto" class="btn">Pide presupuesto</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="/">Inicio</a> / <a href="/blog/">Blog</a> / {{ title }}</div>
+    {% if categoria %}<span class="cat">{{ categoria }}</span>{% endif %}
+    <h1>{{ title }}</h1>
+    <div class="meta">Publicado el {{ date | fechaLegible }}{% if autor %} · por {{ autor }}{% endif %}</div>
+  </div>
+  {% if imagen %}<img class="cover" src="{{ imagen }}" alt="{{ title }}">{% endif %}
+</div>
+
+<article>
+  <div class="wrap">
+    {{ content | safe }}
+
+    <div class="cta">
+      <h3>¿Necesitas limpieza profesional en Castellón?</h3>
+      <p>Pide tu presupuesto sin compromiso. Te respondemos en menos de 24h.</p>
+      <a href="/#contacto" class="btn">Pide presupuesto gratis</a>
+    </div>
+
+    <a class="back" href="/blog/">← Volver al blog</a>
+  </div>
+</article>
+
+<footer>
+  <div class="wrap">
+    <div class="ft-top">{{ site.nombre }}</div>
+    <p>{{ site.direccion }} · <a href="tel:{{ site.telefonoLink }}">{{ site.telefono }}</a></p>
+    <p style="margin-top:6px">© 2026 {{ site.nombre }} · <a href="/">Volver al inicio</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

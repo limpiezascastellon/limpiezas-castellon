@@ -1,0 +1,30 @@
+backend:
+  name: github
+  repo: Ivanrm01/limpiezas-castellon          # ← tu usuario/repo de GitHub
+  branch: main
+  base_url: https://limpiezas-castellon.vercel.app   # ← tu dominio de Vercel (sin barra final)
+  auth_endpoint: api/auth
+
+# Carpeta donde Decap sube las imágenes que añadas desde el panel
+media_folder: "img/blog"
+public_folder: "/img/blog"
+
+locale: "es"
+
+collections:
+  - name: "blog"
+    label: "Artículos del blog"
+    label_singular: "Artículo"
+    folder: "posts"
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}  ·  {{date | date('DD/MM/YYYY')}}"
+    sortable_fields: ["date", "title"]
+    fields:
+      - { name: "title", label: "Título", widget: "string" }
+      - { name: "description", label: "Descripción (para Google y redes)", widget: "text", pattern: ['.{50,160}', "Recomendado entre 50 y 160 caracteres"] }
+      - { name: "date", label: "Fecha de publicación", widget: "datetime", date_format: "DD/MM/YYYY", time_format: false, format: "YYYY-MM-DD" }
+      - { name: "categoria", label: "Categoría", widget: "select", options: ["Comunidades", "Oficinas", "Locales", "Productos", "Salud", "Guía", "Consejos"], default: "Consejos" }
+      - { name: "autor", label: "Autor", widget: "string", default: "Limpiezas Castellón", required: false }
+      - { name: "imagen", label: "Imagen de portada", widget: "image", required: false, hint: "Imagen que aparece arriba del artículo y en la lista del blog" }
+      - { name: "body", label: "Contenido del artículo", widget: "markdown" }
