@@ -1,0 +1,134 @@
+---
+pagination:
+  data: collections.blog
+  size: 100
+  alias: posts
+permalink: "/blog/index.html"
+eleventyExcludeFromCollections: true
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Blog · {{ site.nombre }}</title>
+<meta name="description" content="Consejos y novedades sobre limpieza de comunidades, oficinas y locales en Castellón.">
+<link rel="canonical" href="{{ site.url }}/blog/">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/img/icon-192.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta name="theme-color" content="#072B53">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C2A3E;--ink-soft:#3E5A6E;--brand:#0E5AA7;--brand-deep:#0A3A6E;--brand-darker:#072B53;
+  --fresh:#16C2B0;--fresh-deep:#0E9C8E;--mist:#E9F3FA;--cloud:#F3F8FC;--line:#DCE8F1;
+  --d:Bricolage Grotesque,sans-serif;--b:Hanken Grotesk,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--b);color:var(--ink);background:#fff;line-height:1.65;overflow-x:hidden;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:rgba(14,90,167,.12)}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:var(--d);letter-spacing:-.02em;line-height:1.15}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+
+header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);z-index:10}
+.nav{padding:14px 22px;display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:11px}
+.logo-mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--fresh));display:grid;place-items:center}
+.logo-mark svg{width:23px;height:23px;stroke:#fff;fill:none;stroke-width:2}
+.logo b{font-family:var(--d);font-weight:800;font-size:1.08rem;display:block;line-height:1;color:var(--ink)}
+.logo span{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--fresh-deep);font-weight:600}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{font-family:var(--d);font-weight:500;color:var(--ink-soft);font-size:.95rem}
+.nav-links a:hover{color:var(--brand)}
+.btn{background:var(--fresh);color:#04231f;font-family:var(--d);font-weight:600;padding:10px 20px;border-radius:100px;font-size:.92rem}
+
+.phead{background:linear-gradient(150deg,var(--brand-darker),var(--brand-deep));color:#fff;padding:60px 0 64px}
+.phead h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;margin-bottom:12px}
+.phead p{color:#d4e6f5;font-size:1.1rem;max-width:560px}
+
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding:60px 0}
+.bcard{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;transition:.3s}
+.bcard:hover{transform:translateY(-8px);box-shadow:0 18px 50px -22px rgba(10,58,110,.35);border-color:transparent}
+.bimg{aspect-ratio:16/10;background-size:cover;background-position:center;background-color:var(--mist);position:relative}
+.cat{position:absolute;bottom:14px;left:14px;background:var(--fresh);color:#04231f;font-family:var(--d);font-weight:600;font-size:.76rem;padding:5px 13px;border-radius:100px}
+.bbody{padding:24px;display:flex;flex-direction:column;gap:10px;flex:1}
+.bmeta{font-size:.8rem;color:var(--ink-soft)}
+.bcard h2{font-size:1.2rem;line-height:1.25}
+.bcard p{color:var(--ink-soft);font-size:.94rem;flex:1}
+.bread{font-family:var(--d);font-weight:600;color:var(--brand);font-size:.92rem}
+.empty{padding:60px 0;text-align:center;color:var(--ink-soft)}
+
+footer{background:var(--brand-darker);color:#9fc1dc;padding:40px 0;text-align:center;font-size:.9rem}
+footer a{color:var(--fresh)}
+.ft-top{font-family:var(--d);color:#fff;font-weight:600;margin-bottom:6px}
+
+@media(max-width:860px){.bgrid{grid-template-columns:1fr 1fr;gap:22px;padding:44px 0}}
+@media(max-width:560px){
+  .bgrid{grid-template-columns:1fr;padding:36px 0}
+  .nav-links a:not(.btn){display:none}
+  .nav{padding:12px 18px}
+  .logo img{height:34px!important}
+  .phead{padding:44px 0 48px}
+  .wrap{padding:0 18px}
+  .bbody{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a class="logo" href="/">
+      <img src="/img/logo-limpiezas-castellon.png" alt="{{ site.nombre }}" width="700" height="288" style="height:40px;width:auto">
+    </a>
+    <nav class="nav-links">
+      <a href="/">Inicio</a>
+      <a href="/blog/">Blog</a>
+      <a href="/#contacto" class="btn">Pide presupuesto</a>
+    </nav>
+  </div>
+</header>
+
+<div class="phead">
+  <div class="wrap">
+    <h1>Blog de limpieza</h1>
+    <p>Consejos y novedades para mantener comunidades, oficinas y locales impecables en Castellón.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  {% if posts.length === 0 %}
+    <div class="empty">Todavía no hay artículos publicados. Vuelve pronto.</div>
+  {% else %}
+  <div class="bgrid">
+    {% for post in posts %}
+    <a class="bcard" href="/blog/{{ post.fileSlug }}/">
+      <div class="bimg" style="background-image:url('{{ post.data.imagen }}')">
+        {% if post.data.categoria %}<span class="cat">{{ post.data.categoria }}</span>{% endif %}
+      </div>
+      <div class="bbody">
+        <div class="bmeta">{{ post.date | fechaLegible }}</div>
+        <h2>{{ post.data.title }}</h2>
+        <p>{{ post.data.description }}</p>
+        <span class="bread">Leer más →</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="ft-top">{{ site.nombre }}</div>
+    <p>{{ site.direccion }} · <a href="tel:{{ site.telefonoLink }}">{{ site.telefono }}</a></p>
+    <p style="margin-top:6px">© 2026 {{ site.nombre }} · <a href="/">Volver al inicio</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

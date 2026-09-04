@@ -1,0 +1,17 @@
+{
+  "name": "limpiezas-castellon-web",
+  "version": "1.0.0",
+  "description": "Web de Limpiezas Castellon con blog gestionable (Decap CMS) y panel de presupuestos",
+  "scripts": {
+    "build": "eleventy",
+    "dev": "eleventy --serve"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "^2.0.1",
+    "@vercel/kv": "^1.0.1",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "luxon": "^3.4.4",
+    "markdown-it": "^14.0.0"
+  }
+}

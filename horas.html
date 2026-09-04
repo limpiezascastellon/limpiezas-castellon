@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0E5AA7">
+<title>Mis horas · Limpiezas Castellón</title>
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C2A3E;--ink-soft:#3E5A6E;--brand:#0E5AA7;--brand-deep:#0A3A6E;
+  --fresh:#16C2B0;--fresh-deep:#0E9C8E;--cloud:#F3F8FC;--mist:#E9F3FA;--line:#DCE8F1;
+  --rojo:#C0392B;--ambar:#8A5A00;--finde-bg:#FFFDF3;--finde-line:#F0DCA8;
+  --d:Bricolage Grotesque,sans-serif;--b:Hanken Grotesk,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--b);background:var(--cloud);color:var(--ink);line-height:1.55;
+     padding-bottom:env(safe-area-inset-bottom);-webkit-font-smoothing:antialiased;
+     -webkit-text-size-adjust:100%;overflow-x:hidden}
+body.bloqueado{overflow:hidden}
+h1,h2,h3{font-family:var(--d);line-height:1.2}
+button{font-family:var(--d);cursor:pointer;border:none}
+.wrap{max-width:600px;margin:0 auto;
+  padding:0 max(16px,env(safe-area-inset-left)) 0 max(16px,env(safe-area-inset-right))}
+.hide{display:none !important}
+
+/* ---------- ENTRAR ---------- */
+.login{max-width:400px;margin:44px auto;padding:0 16px}
+.login-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px 26px;text-align:center}
+.login-card img{max-width:170px;margin:0 auto 20px;display:block}
+.login-card h1{font-size:1.35rem;margin-bottom:6px}
+.login-card p{color:var(--ink-soft);font-size:.94rem;margin-bottom:22px}
+.campo{text-align:left;margin-bottom:14px}
+.campo label{font-family:var(--d);font-weight:600;font-size:.83rem;display:block;margin-bottom:5px}
+.campo input,.campo select{width:100%;padding:14px 15px;border:1.5px solid var(--line);border-radius:12px;
+  font-family:var(--b);font-size:16px;background:#fff;color:var(--ink);appearance:none;-webkit-appearance:none}
+.campo input[type=time]{min-height:52px}
+.campo input:focus,.campo select:focus{outline:none;border-color:var(--fresh)}
+.btn{background:var(--fresh);color:#04231f;font-weight:700;padding:15px 24px;border-radius:12px;font-size:1.02rem;width:100%}
+.btn:active{transform:scale(.99)}
+.btn:disabled{opacity:.5}
+.btn-linea{background:#fff;border:1.5px solid var(--line);color:var(--ink);font-weight:600}
+.btn-rojo{background:#fff;border:1.5px solid #E8BDB7;color:var(--rojo);font-weight:600}
+.aviso{min-height:20px;font-size:.9rem;color:var(--rojo);margin-top:10px}
+
+/* ---------- CABECERA ---------- */
+.top{background:var(--brand);color:#fff;padding:16px 0 20px;position:sticky;top:0;z-index:20}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top .quien{font-family:var(--d);font-weight:700;font-size:1.08rem;min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.top .quien span{display:block;font-family:var(--b);font-weight:400;font-size:.83rem;opacity:.85}
+.salir{background:rgba(255,255,255,.15);color:#fff;font-size:.84rem;font-weight:600;padding:11px 15px;
+  border-radius:10px;min-height:44px;flex-shrink:0}
+.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:5px;margin:-12px 0 18px}
+.tab{flex:1;padding:13px 8px;border-radius:10px;background:none;color:var(--ink-soft);font-weight:600;
+  font-size:.95rem;min-height:46px}
+.tab.on{background:var(--brand);color:#fff}
+
+/* ---------- NAVEGADOR DE SEMANA ---------- */
+.sem{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);
+  border-radius:14px;padding:8px;margin-bottom:14px}
+.sem .flecha{width:44px;height:44px;flex-shrink:0;border-radius:11px;background:var(--mist);color:var(--brand);
+  font-size:1.2rem;font-weight:700;display:grid;place-items:center}
+.sem .flecha:disabled{opacity:.3}
+.sem .centro{flex:1;text-align:center;min-width:0}
+.sem .centro b{font-family:var(--d);font-size:clamp(.88rem,3.9vw,1rem);display:block;line-height:1.25}
+.sem .centro span{font-size:.82rem;color:var(--ink-soft)}
+
+/* ---------- TOTAL (el elemento protagonista) ---------- */
+.total{background:linear-gradient(150deg,var(--brand-deep),var(--brand));color:#fff;border-radius:20px;
+  padding:24px 22px;margin-bottom:16px;text-align:center}
+.total .lab{font-size:.85rem;opacity:.85;font-weight:500}
+.total .big{font-family:var(--d);font-weight:800;font-size:clamp(1.9rem,10vw,2.7rem);line-height:1.1;
+  margin:2px 0;overflow-wrap:break-word}
+.porcli{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px;
+  border-top:1px solid rgba(255,255,255,.22);padding-top:15px}
+.porcli div{background:rgba(255,255,255,.14);border-radius:11px;padding:8px 13px;font-size:.83rem;text-align:left}
+.porcli b{font-family:var(--d);display:block;font-size:1rem;margin-top:1px}
+
+/* ---------- DÍAS ---------- */
+.dia{background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:10px;overflow:hidden}
+.dia.finde{border-color:var(--finde-line);background:var(--finde-bg)}
+.dia.vacio .cab b{color:var(--ink-soft);font-weight:600}
+.dia .cab{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 16px}
+.dia .cab b{font-family:var(--d);font-size:1rem;text-transform:capitalize}
+.dia .cab .tot{font-family:var(--d);font-weight:700;color:var(--brand);white-space:nowrap}
+.dia.vacio .cab .tot{color:#A8BECD;font-weight:600}
+.etq{background:#FFF3D6;color:var(--ambar);font-family:var(--d);font-weight:700;font-size:.68rem;
+  padding:3px 9px;border-radius:100px;margin-left:6px;vertical-align:1px}
+.etq.hoy{background:var(--mist);color:var(--brand)}
+.linea{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;
+  padding:13px 16px;border-top:1px solid var(--mist);background:none;color:inherit;font-family:var(--b);
+  min-height:56px}
+.linea:active{background:var(--cloud)}
+.dia.finde .linea{border-top-color:#F3E7C8}
+.linea .qc{font-family:var(--d);font-weight:700;font-size:.97rem;display:block}
+.linea .hr{font-size:.87rem;color:var(--ink-soft)}
+.linea .nota{font-size:.82rem;color:var(--ink-soft);font-style:italic}
+.linea .der{text-align:right;flex-shrink:0;display:flex;align-items:center;gap:10px}
+.linea .h{font-family:var(--d);font-weight:700;white-space:nowrap}
+.linea .lapiz{color:#A8BECD;font-size:1rem}
+.linea .cerrado{font-size:.72rem;color:var(--ink-soft);font-family:var(--d);font-weight:600}
+.mas{width:100%;text-align:left;padding:15px 16px;border-top:1px dashed var(--line);background:none;
+  color:var(--brand);font-weight:600;font-size:.94rem;min-height:48px}
+.dia.finde .mas{border-top-color:var(--finde-line)}
+.copiar{width:100%;background:#fff;border:1.5px dashed var(--line);color:var(--brand);font-weight:600;
+  padding:14px;border-radius:14px;font-size:.94rem;margin-top:4px}
+
+/* ---------- RESUMEN ---------- */
+.tabla{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.tabla .fila{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--mist);font-size:.94rem}
+.tabla .fila:last-child{border-bottom:none}
+.tabla .fila.finde{background:var(--finde-bg)}
+.tabla .fila b{font-family:var(--d);font-weight:700}
+.tabla .fila .d{text-transform:capitalize}
+.nada{text-align:center;color:var(--ink-soft);padding:40px 20px;background:#fff;border:1px dashed var(--line);border-radius:16px}
+.pie{text-align:center;color:var(--ink-soft);font-size:.83rem;padding:20px 16px 34px;line-height:1.55}
+.enlace{background:none;color:var(--brand);font-weight:600;font-size:.88rem;text-decoration:underline;padding:6px}
+
+/* ---------- AVISO FLOTANTE ---------- */
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(14px);
+  bottom:calc(20px + env(safe-area-inset-bottom));z-index:90;max-width:min(440px,calc(100% - 32px));
+  background:var(--ink);color:#fff;padding:14px 18px;border-radius:13px;font-size:.92rem;
+  text-align:center;box-shadow:0 8px 26px rgba(12,42,62,.28);opacity:0;transition:opacity .2s,transform .2s;
+  pointer-events:none}
+.toast.ver{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- VENTANA ---------- */
+.modal{position:fixed;inset:0;background:rgba(12,42,62,.55);display:flex;align-items:flex-end;
+  justify-content:center;z-index:60;overscroll-behavior:contain}
+.modal-caja{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:600px;
+  padding:24px 20px calc(30px + env(safe-area-inset-bottom));
+  max-height:88vh;max-height:88dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain}
+.modal-caja h3{font-size:1.18rem;margin-bottom:4px}
+.modal-caja .sub{color:var(--ink-soft);font-size:.9rem;margin-bottom:18px;text-transform:capitalize}
+.fila2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calculo{background:var(--mist);border-radius:12px;padding:13px 16px;text-align:center;font-family:var(--d);
+  font-weight:700;color:var(--brand-deep);margin-bottom:16px}
+.otros{margin-bottom:16px}
+.otros p{font-family:var(--d);font-weight:600;font-size:.83rem;margin-bottom:8px}
+.otros .chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:11px 13px;font-size:.88rem;
+  font-weight:600;color:var(--ink-soft);text-transform:capitalize;min-height:44px}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.chip.finde{border-color:var(--finde-line)}
+.chip.finde.on{background:var(--ambar);border-color:var(--ambar)}
+.botonera{display:flex;gap:10px;margin-top:6px}
+.botonera .btn{flex:1}
+@media(min-width:640px){.modal{align-items:center}.modal-caja{border-radius:22px}}
+@media(max-width:360px){
+  .wrap{padding:0 12px}
+  .dia .cab,.linea,.mas{padding-left:13px;padding-right:13px}
+  .total{padding:20px 16px}
+  .porcli div{padding:7px 10px;font-size:.79rem}
+  .fila2{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+
+<!-- ================= ENTRAR ================= -->
+<div id="login" class="login">
+  <div class="login-card">
+    <img src="/img/logo-mini.png" alt="Limpiezas Castellón">
+    <h1>Mi parte de horas</h1>
+    <p>Entra con el usuario y la contraseña que te ha dado la oficina.</p>
+    <div class="campo">
+      <label for="usuario">Usuario</label>
+      <input id="usuario" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="maria">
+    </div>
+    <div class="campo">
+      <label for="clave">Contraseña</label>
+      <input id="clave" type="password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <button class="btn" id="btn-entrar" onclick="entrar()">Entrar</button>
+    <div class="aviso" id="login-aviso"></div>
+  </div>
+</div>
+
+<!-- ================= PANEL ================= -->
+<div id="app" class="hide">
+  <div class="top">
+    <div class="wrap">
+      <div class="quien" id="quien">—<span id="quien-sub"></span></div>
+      <button class="salir" onclick="salir()">Salir</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab on" id="tab-semana" onclick="verPestana('semana')">Apuntar horas</button>
+      <button class="tab" id="tab-mes" onclick="verPestana('mes')">Resumen del mes</button>
+    </div>
+
+    <!-- ---------- SEMANA ---------- -->
+    <div id="pane-semana">
+      <div class="sem">
+        <button class="flecha" id="sem-atras" onclick="moverSemana(-1)" aria-label="Semana anterior">‹</button>
+        <div class="centro"><b id="sem-titulo">—</b><span id="sem-sub"></span></div>
+        <button class="flecha" id="sem-alante" onclick="moverSemana(1)" aria-label="Semana siguiente">›</button>
+      </div>
+      <div id="sem-total"></div>
+      <div id="sem-dias"></div>
+      <div id="sem-copiar"></div>
+      <p class="pie">Puedes apuntar las horas cuando te venga bien: cada día, al acabar la semana o a fin de mes.</p>
+    </div>
+
+    <!-- ---------- MES ---------- -->
+    <div id="pane-mes" class="hide">
+      <div class="campo">
+        <label for="mes">Mes</label>
+        <select id="mes" onchange="pintarMes()"></select>
+      </div>
+      <div id="mes-total"></div>
+      <div id="mes-detalle"></div>
+      <p class="pie">Aquí tienes tus horas de los últimos dos meses.<br>Los meses anteriores los conserva la oficina.</p>
+    </div>
+
+    <p class="pie"><button class="enlace" onclick="abrirClave()">Cambiar mi contraseña</button></p>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="modal" class="modal hide" onclick="if(event.target===this)cerrarModal()">
+  <div class="modal-caja" id="modal-caja"></div>
+</div>
+
+<script>
+/* =========================================================================
+   ESTADO
+   ========================================================================= */
+var API = "/api/fichajes";
+var token = leerGuardado("lc_emp_token");
+var datos = { empleada:null, clientes:[], limite:"", hoy:null };
+var registros = [];
+var lunesVisible = "";
+
+var DIAS  = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+function leerGuardado(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
+function guardar(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function borrarGuardado(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+/* =========================================================================
+   FECHAS  (todas en formato AAAA-MM-DD, calculadas a mediodía UTC
+   para que ningún cambio de hora las desplace de día)
+   ========================================================================= */
+function aDate(f){ return new Date(f + "T12:00:00Z"); }
+function aTexto(d){ return d.toISOString().slice(0,10); }
+function sumarDias(f, n){ var d = aDate(f); d.setUTCDate(d.getUTCDate() + n); return aTexto(d); }
+function lunesDe(f){ var d = aDate(f); var dow = (d.getUTCDay() + 6) % 7; return sumarDias(f, -dow); }
+function diaSemana(f){ return aDate(f).getUTCDay(); }
+function esFinde(f){ var s = diaSemana(f); return s === 0 || s === 6; }
+function nombreDia(f){ return DIAS[diaSemana(f)]; }
+function diaMes(f){ return aDate(f).getUTCDate(); }
+function nombreMes(f){ return MESES[aDate(f).getUTCMonth()]; }
+function hoyFecha(){ return (datos.hoy && datos.hoy.fecha) || new Date().toISOString().slice(0,10); }
+
+/* =========================================================================
+   SERVIDOR
+   ========================================================================= */
+async function llamar(accion, cuerpo){
+  var r = await fetch(API, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "x-emp-token": token },
+    body: JSON.stringify(Object.assign({ accion: accion }, cuerpo||{}))
+  });
+  var j = {};
+  try { j = await r.json(); } catch(e){}
+  if(r.status === 401 && accion !== "login"){ salir(true); throw new Error(j.error||"Sesión caducada"); }
+  if(!r.ok) throw new Error(j.error || "No se ha podido completar la operación");
+  return j;
+}
+
+async function entrar(){
+  var u = document.getElementById("usuario").value.trim();
+  var p = document.getElementById("clave").value;
+  var aviso = document.getElementById("login-aviso");
+  var boton = document.getElementById("btn-entrar");
+  if(!u || !p){ aviso.textContent = "Escribe tu usuario y tu contraseña."; return; }
+  aviso.textContent = "Entrando…";
+  boton.disabled = true;
+  try{
+    var j = await llamar("login", { usuario:u, pass:p });
+    token = j.token; guardar("lc_emp_token", token);
+    aplicarDatos(j);
+    document.getElementById("login").classList.add("hide");
+    document.getElementById("app").classList.remove("hide");
+    await cargarHoras();
+  }catch(e){ aviso.textContent = e.message; }
+  finally{ boton.disabled = false; }
+}
+
+function salir(silencioso){
+  borrarGuardado("lc_emp_token"); token = "";
+  document.getElementById("app").classList.add("hide");
+  document.getElementById("login").classList.remove("hide");
+  document.getElementById("clave").value = "";
+  document.getElementById("login-aviso").textContent = silencioso ? "Tu sesión ha caducado. Vuelve a entrar." : "";
+}
+
+function aplicarDatos(j){
+  datos = Object.assign(datos, j);
+  var e = j.empleada || {};
+  document.getElementById("quien").childNodes[0].nodeValue = e.nombre || "";
+  document.getElementById("quien-sub").textContent = "Usuario: " + (e.usuario||"");
+  if(!lunesVisible) lunesVisible = lunesDe(hoyFecha());
+  prepararMeses();
+}
+
+async function cargarHoras(){
+  try{
+    var j = await llamar("mios", {});
+    registros = j.registros || [];
+    datos.limite = j.limite;
+    datos.hoy = j.hoy;
+    pintarSemana();
+    pintarMes();
+  }catch(e){
+    document.getElementById("sem-dias").innerHTML = '<div class="nada">' + esc(e.message) + '</div>';
+  }
+}
+
+/* =========================================================================
+   PESTAÑAS
+   ========================================================================= */
+function verPestana(cual){
+  document.getElementById("tab-semana").classList.toggle("on", cual==="semana");
+  document.getElementById("tab-mes").classList.toggle("on", cual==="mes");
+  document.getElementById("pane-semana").classList.toggle("hide", cual!=="semana");
+  document.getElementById("pane-mes").classList.toggle("hide", cual!=="mes");
+  window.scrollTo(0,0);
+}
+
+/* =========================================================================
+   SEMANA: aquí es donde se apuntan las horas
+   ========================================================================= */
+function moverSemana(n){
+  lunesVisible = sumarDias(lunesVisible, n*7);
+  pintarSemana();
+}
+
+function pintarSemana(){
+  var dias = [];
+  for(var i=0;i<7;i++) dias.push(sumarDias(lunesVisible, i));
+  var domingo = dias[6];
+  var hoy = hoyFecha();
+  var limite = datos.limite || "";
+
+  // Cabecera del navegador
+  var t1 = diaMes(dias[0]) + " de " + nombreMes(dias[0]);
+  var t2 = diaMes(domingo) + " de " + nombreMes(domingo);
+  document.getElementById("sem-titulo").textContent =
+    (nombreMes(dias[0]) === nombreMes(domingo))
+      ? diaMes(dias[0]) + " – " + diaMes(domingo) + " de " + nombreMes(domingo)
+      : t1 + " – " + t2;
+  document.getElementById("sem-sub").textContent =
+    (lunesVisible <= hoy && domingo >= hoy) ? "esta semana" : aDate(domingo).getUTCFullYear();
+  document.getElementById("sem-atras").disabled  = limite && domingo < limite;
+  document.getElementById("sem-alante").disabled = lunesVisible > hoy;
+
+  // Total de la semana y reparto por cliente
+  var deLaSemana = registros.filter(function(r){ return r.fecha >= dias[0] && r.fecha <= domingo; });
+  var totalMin = 0, porCli = {};
+  deLaSemana.forEach(function(r){
+    totalMin += r.minutos || 0;
+    porCli[r.cliNombre||"—"] = (porCli[r.cliNombre||"—"]||0) + (r.minutos||0);
+  });
+  var chips = Object.keys(porCli).sort().map(function(n){
+    return '<div>' + esc(n) + '<b>' + horasTexto(porCli[n]) + '</b></div>';
+  }).join("");
+  document.getElementById("sem-total").innerHTML =
+    '<div class="total"><div class="lab">Total de la semana</div>' +
+    '<div class="big">' + horasTexto(totalMin) + '</div>' +
+    (chips ? '<div class="porcli">' + chips + '</div>'
+           : '<div class="lab" style="margin-top:4px">Todavía no has apuntado nada</div>') +
+    '</div>';
+
+  // Un bloque por día
+  document.getElementById("sem-dias").innerHTML = dias.map(function(f){
+    var delDia = deLaSemana.filter(function(r){ return r.fecha === f; })
+                           .sort(function(a,b){ return (a.entrada||"").localeCompare(b.entrada||""); });
+    var min = delDia.reduce(function(s,r){ return s + (r.minutos||0); }, 0);
+    var futuro = f > hoy;
+    var fuera = limite && f < limite;
+
+    var etiquetas = "";
+    if(f === hoy) etiquetas += ' <span class="etq hoy">hoy</span>';
+    else if(esFinde(f)) etiquetas += ' <span class="etq">finde</span>';
+
+    var lineas = delDia.map(function(r){
+      var editable = !r.validado && !fuera;
+      return '<button class="linea"' + (editable ? ' onclick="abrirEditar(\'' + r.id + '\')"' : ' disabled') + '>' +
+        '<span><span class="qc">' + esc(r.cliNombre||"—") + '</span>' +
+          '<span class="hr">' + esc(r.entrada) + " – " + esc(r.salida||"—") + '</span>' +
+          (r.notas ? '<span class="nota">' + esc(r.notas) + '</span>' : '') +
+        '</span>' +
+        '<span class="der"><span class="h">' + horasTexto(r.minutos) + '</span>' +
+          (editable ? '<span class="lapiz">✎</span>' : '<span class="cerrado">revisado</span>') + '</span>' +
+      '</button>';
+    }).join("");
+
+    var boton = (futuro || fuera) ? "" :
+      '<button class="mas" onclick="abrirAnadir(\'' + f + '\')">+ Apuntar horas de este día</button>';
+
+    return '<div class="dia' + (esFinde(f) ? " finde" : "") + (min ? "" : " vacio") + '">' +
+      '<div class="cab"><b>' + nombreDia(f) + " " + diaMes(f) + etiquetas + '</b>' +
+        '<span class="tot">' + (min ? horasTexto(min) : (futuro ? "" : "—")) + '</span></div>' +
+      lineas + boton +
+    '</div>';
+  }).join("");
+
+  // Copiar la semana anterior, solo si tiene sentido ofrecerlo
+  var anterior = sumarDias(lunesVisible, -7);
+  var hayAnterior = registros.some(function(r){ return r.fecha >= anterior && r.fecha < lunesVisible; });
+  document.getElementById("sem-copiar").innerHTML =
+    (!deLaSemana.length && hayAnterior && lunesVisible <= hoy)
+      ? '<button class="copiar" onclick="copiarSemanaAnterior(this)">Copiar los horarios de la semana pasada</button>'
+      : "";
+}
+
+/* =========================================================================
+   APUNTAR HORAS
+   ========================================================================= */
+function abrirModal(html){
+  document.getElementById("modal-caja").innerHTML = html;
+  document.getElementById("modal").classList.remove("hide");
+  document.body.classList.add("bloqueado");   // el fondo no se mueve al hacer scroll
+}
+function cerrarModal(){
+  document.getElementById("modal").classList.add("hide");
+  document.body.classList.remove("bloqueado");
+}
+
+function abrirAnadir(fecha){
+  if(!datos.clientes.length){ avisoBreve("Todavía no tienes clientes asignados. Avisa a la oficina."); return; }
+  var hoy = hoyFecha(), limite = datos.limite || "";
+
+  // Los demás días de esa misma semana, para rellenar varios de una vez
+  var otros = [];
+  for(var i=0;i<7;i++){
+    var f = sumarDias(lunesDe(fecha), i);
+    if(f === fecha || f > hoy || (limite && f < limite)) continue;
+    otros.push(f);
+  }
+
+  abrirModal(
+    '<h3>Apuntar horas</h3>' +
+    '<div class="sub">' + nombreDia(fecha) + " " + diaMes(fecha) + " de " + nombreMes(fecha) + '</div>' +
+    '<div class="campo"><label for="a-cli">¿En qué cliente?</label><select id="a-cli">' +
+      datos.clientes.map(function(c){ return '<option value="'+c.id+'">'+esc(c.nombre)+'</option>'; }).join("") +
+    '</select></div>' +
+    '<div class="fila2">' +
+      '<div class="campo"><label for="a-ent">Hora de entrada</label><input id="a-ent" type="time" oninput="calcular()"></div>' +
+      '<div class="campo"><label for="a-sal">Hora de salida</label><input id="a-sal" type="time" oninput="calcular()"></div>' +
+    '</div>' +
+    '<div class="calculo" id="a-calc">Pon las dos horas y te calculo el total</div>' +
+    (otros.length
+      ? '<div class="otros"><p>¿Hiciste el mismo horario otros días de esta semana? Márcalos:</p><div class="chips">' +
+        otros.map(function(f){
+          return '<button type="button" class="chip' + (esFinde(f) ? " finde" : "") + '" data-f="' + f + '" ' +
+                 'onclick="this.classList.toggle(&quot;on&quot;)">' + nombreDia(f).slice(0,3) + " " + diaMes(f) + '</button>';
+        }).join("") + '</div></div>'
+      : '') +
+    '<div class="campo"><label for="a-notas">Nota (opcional)</label><input id="a-notas" type="text" placeholder="Cristales, refuerzo…"></div>' +
+    '<div class="aviso" id="a-aviso"></div>' +
+    '<div class="botonera">' +
+      '<button class="btn btn-linea" onclick="cerrarModal()">Cancelar</button>' +
+      '<button class="btn" onclick="guardarAnadir(\'' + fecha + '\', this)">Guardar</button>' +
+    '</div>'
+  );
+}
+
+function calcular(){
+  var e = document.getElementById("a-ent").value, s = document.getElementById("a-sal").value;
+  var caja = document.getElementById("a-calc");
+  if(!e || !s){ caja.textContent = "Pon las dos horas y te calculo el total"; return; }
+  var min = minutosEntre(e, s);
+  caja.textContent = min === 0 ? "Las dos horas son iguales" : "Son " + horasTexto(min);
+}
+
+async function guardarAnadir(fecha, boton){
+  var aviso = document.getElementById("a-aviso");
+  aviso.textContent = ""; boton.disabled = true;
+  var cliId = document.getElementById("a-cli").value;
+  var entrada = document.getElementById("a-ent").value;
+  var salida = document.getElementById("a-sal").value;
+  var notas = document.getElementById("a-notas").value;
+  var fechas = [fecha].concat(
+    [].map.call(document.querySelectorAll(".chip.on"), function(c){ return c.getAttribute("data-f"); })
+  );
+  try{
+    var j = await llamar("emp-crear", {
+      lineas: fechas.map(function(f){ return { cliId:cliId, fecha:f, entrada:entrada, salida:salida, notas:notas }; })
+    });
+    cerrarModal();
+    await cargarHoras();
+    if(j.duplicados) avisoBreve("Ya tenías apuntado ese horario en " + j.duplicados + (j.duplicados===1?" día":" días"));
+  }catch(e){ aviso.textContent = e.message; boton.disabled = false; }
+}
+
+function abrirEditar(id){
+  var r = registros.find(function(x){ return x.id===id; });
+  if(!r) return;
+  abrirModal(
+    '<h3>Corregir horas</h3>' +
+    '<div class="sub">' + esc(r.cliNombre) + " · " + nombreDia(r.fecha) + " " + diaMes(r.fecha) + " de " + nombreMes(r.fecha) + '</div>' +
+    '<div class="fila2">' +
+      '<div class="campo"><label for="e-ent">Hora de entrada</label><input id="e-ent" type="time" value="'+esc(r.entrada)+'"></div>' +
+      '<div class="campo"><label for="e-sal">Hora de salida</label><input id="e-sal" type="time" value="'+esc(r.salida||"")+'"></div>' +
+    '</div>' +
+    '<div class="campo"><label for="e-notas">Nota</label><input id="e-notas" type="text" value="'+esc(r.notas||"")+'"></div>' +
+    '<div class="aviso" id="e-aviso"></div>' +
+    '<div class="botonera">' +
+      '<button class="btn btn-linea" onclick="cerrarModal()">Cancelar</button>' +
+      '<button class="btn" onclick="guardarEditar(\''+id+'\',this)">Guardar</button>' +
+    '</div>' +
+    '<button class="btn btn-rojo" style="margin-top:10px" onclick="borrarLinea(\''+id+'\')">Borrar estas horas</button>'
+  );
+}
+
+async function guardarEditar(id, boton){
+  var aviso = document.getElementById("e-aviso");
+  aviso.textContent = ""; boton.disabled = true;
+  try{
+    await llamar("emp-editar", {
+      id: id,
+      entrada: document.getElementById("e-ent").value,
+      salida: document.getElementById("e-sal").value,
+      notas: document.getElementById("e-notas").value
+    });
+    cerrarModal();
+    await cargarHoras();
+  }catch(e){ aviso.textContent = e.message; boton.disabled = false; }
+}
+
+async function borrarLinea(id){
+  if(!confirm("¿Borrar estas horas?")) return;
+  try{
+    await llamar("emp-borrar", { id: id });
+    cerrarModal();
+    await cargarHoras();
+  }catch(e){ avisoBreve(e.message); }
+}
+
+async function copiarSemanaAnterior(boton){
+  var anterior = sumarDias(lunesVisible, -7);
+  var hoy = hoyFecha();
+  var lineas = registros
+    .filter(function(r){ return r.fecha >= anterior && r.fecha < lunesVisible && r.salida; })
+    .map(function(r){
+      var destino = sumarDias(r.fecha, 7);
+      return destino > hoy ? null
+           : { cliId:r.cliId, fecha:destino, entrada:r.entrada, salida:r.salida, notas:r.notas||"" };
+    })
+    .filter(Boolean);
+
+  if(!lineas.length){ avisoBreve("En la semana pasada no hay días que se puedan copiar todavía."); return; }
+  if(!confirm("Se van a copiar " + lineas.length + (lineas.length===1?" horario":" horarios") +
+              " de la semana pasada a esta.\n\nDespués puedes corregir lo que no cuadre.")) return;
+
+  boton.disabled = true; boton.textContent = "Copiando…";
+  try{
+    await llamar("emp-crear", { lineas: lineas });
+    await cargarHoras();
+  }catch(e){ alert(e.message); boton.disabled = false; boton.textContent = "Copiar los horarios de la semana pasada"; }
+}
+
+/* =========================================================================
+   RESUMEN DEL MES
+   ========================================================================= */
+function prepararMeses(){
+  var sel = document.getElementById("mes");
+  var hoy = hoyFecha();
+  var opciones = "";
+  for(var i=0;i<3;i++){
+    var d = aDate(hoy); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth()-i);
+    var clave = aTexto(d).slice(0,7);
+    if(datos.limite && clave < datos.limite.slice(0,7)) break;
+    opciones += '<option value="'+clave+'">' + MESES[d.getUTCMonth()] + " " + d.getUTCFullYear() + '</option>';
+  }
+  sel.innerHTML = opciones;
+}
+
+function pintarMes(){
+  var sel = document.getElementById("mes");
+  if(!sel.value && sel.options.length) sel.selectedIndex = 0;
+  var mes = sel.value;
+  var lista = registros.filter(function(r){ return r.fecha.slice(0,7) === mes; });
+  var total = document.getElementById("mes-total");
+  var det = document.getElementById("mes-detalle");
+
+  if(!lista.length){
+    total.innerHTML = "";
+    det.innerHTML = '<div class="nada">Aún no has apuntado horas en este mes.</div>';
+    return;
+  }
+
+  var totalMin = 0, findeMin = 0, porCli = {};
+  lista.forEach(function(r){
+    totalMin += r.minutos||0;
+    if(r.finDeSemana) findeMin += r.minutos||0;
+    porCli[r.cliNombre||"—"] = (porCli[r.cliNombre||"—"]||0) + (r.minutos||0);
+  });
+  var chips = Object.keys(porCli).sort().map(function(n){
+    return '<div>' + esc(n) + '<b>' + horasTexto(porCli[n]) + '</b></div>';
+  }).join("");
+  total.innerHTML =
+    '<div class="total"><div class="lab">Total del mes</div>' +
+    '<div class="big">' + horasTexto(totalMin) + '</div>' +
+    '<div class="lab">' + lista.length + (lista.length===1?" apunte":" apuntes") +
+      (findeMin ? " · " + horasTexto(findeMin) + " en fin de semana" : "") + '</div>' +
+    (chips ? '<div class="porcli">' + chips + '</div>' : '') +
+    '</div>';
+
+  var porDia = {};
+  lista.forEach(function(r){ porDia[r.fecha] = (porDia[r.fecha]||0) + (r.minutos||0); });
+  det.innerHTML = '<div class="tabla">' + Object.keys(porDia).sort().map(function(f){
+    return '<div class="fila' + (esFinde(f) ? " finde" : "") + '">' +
+      '<span class="d">' + nombreDia(f) + " " + diaMes(f) + '</span>' +
+      '<b>' + horasTexto(porDia[f]) + '</b></div>';
+  }).join("") + '</div>';
+}
+
+/* =========================================================================
+   CONTRASEÑA
+   ========================================================================= */
+function abrirClave(){
+  abrirModal(
+    '<h3>Cambiar mi contraseña</h3><div class="sub">&nbsp;</div>' +
+    '<div class="campo"><label for="c-act">Contraseña actual</label><input id="c-act" type="password" autocomplete="current-password"></div>' +
+    '<div class="campo"><label for="c-new">Contraseña nueva</label><input id="c-new" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres"></div>' +
+    '<div class="aviso" id="c-aviso"></div>' +
+    '<div class="botonera">' +
+      '<button class="btn btn-linea" onclick="cerrarModal()">Cancelar</button>' +
+      '<button class="btn" onclick="guardarClave(this)">Guardar</button>' +
+    '</div>'
+  );
+}
+async function guardarClave(boton){
+  var aviso = document.getElementById("c-aviso");
+  aviso.textContent = ""; boton.disabled = true;
+  try{
+    await llamar("emp-clave", {
+      actual: document.getElementById("c-act").value,
+      nueva: document.getElementById("c-new").value
+    });
+    cerrarModal();
+    avisoBreve("Contraseña cambiada. Úsala la próxima vez que entres.");
+  }catch(e){ aviso.textContent = e.message; boton.disabled = false; }
+}
+
+/* =========================================================================
+   AYUDAS
+   ========================================================================= */
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+function horasTexto(min){
+  min = Math.round(min||0);
+  var h = Math.floor(min/60), m = min%60;
+  if(h && m) return h + " h " + m + " min";
+  if(h) return h + " h";
+  return m + " min";
+}
+function minutosEntre(e, s){
+  var a = e.split(":"), b = s.split(":");
+  var min = (+b[0]*60 + +b[1]) - (+a[0]*60 + +a[1]);
+  if(min < 0) min += 1440;
+  return min;
+}
+var toastTimer = null;
+function avisoBreve(texto){
+  var t = document.getElementById("toast");
+  t.textContent = texto;
+  t.classList.add("ver");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("ver"); }, 3200);
+}
+
+document.getElementById("clave").addEventListener("keydown", function(e){ if(e.key==="Enter") entrar(); });
+document.getElementById("usuario").addEventListener("keydown", function(e){ if(e.key==="Enter") document.getElementById("clave").focus(); });
+
+/* Arranque: si ya había sesión guardada, entrar directamente */
+(async function(){
+  if(!token) return;
+  try{
+    var j = await llamar("sesion", {});
+    aplicarDatos(j);
+    document.getElementById("login").classList.add("hide");
+    document.getElementById("app").classList.remove("hide");
+    await cargarHoras();
+  }catch(e){ borrarGuardado("lc_emp_token"); token=""; }
+})();
+</script>
+</body>
+</html>
