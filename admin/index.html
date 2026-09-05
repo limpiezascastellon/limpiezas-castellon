@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Panel de administración · Limpiezas Castellón</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="/admin/xlsx.full.min.js"></script>
+<style>
+:root{
+  --ink:#0C2A3E;--ink-soft:#3E5A6E;--brand:#0E5AA7;--brand-deep:#0A3A6E;--brand-darker:#072B53;
+  --fresh:#16C2B0;--fresh-deep:#0E9C8E;--cloud:#F3F8FC;--mist:#E9F3FA;--line:#DCE8F1;
+  --d:Bricolage Grotesque,sans-serif;--b:Hanken Grotesk,sans-serif;
+  --sidebar-w:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--b);background:var(--cloud);color:var(--ink);line-height:1.6;min-height:100vh}
+h1,h2,h3,h4{font-family:var(--d)}
+a{color:inherit;text-decoration:none}
+
+/* ===== LAYOUT con sidebar ===== */
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--line);position:fixed;left:0;top:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:24px 20px 18px;text-align:center;border-bottom:1px solid var(--line)}
+.sb-logo img{max-width:160px;height:auto;margin:0 auto}
+.sb-nav{flex:1;padding:14px 12px;overflow-y:auto}
+.sb-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;font-family:var(--d);font-weight:600;font-size:.95rem;color:var(--ink-soft);cursor:pointer;margin-bottom:3px;transition:background .15s,color .15s}
+.sb-item:hover{background:var(--mist);color:var(--brand)}
+.sb-item.on{background:var(--brand);color:#fff}
+.sb-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2}
+.sb-foot{padding:14px 16px;border-top:1px solid var(--line)}
+.sb-logout{display:flex;align-items:center;gap:10px;font-family:var(--d);font-weight:600;font-size:.88rem;color:var(--ink-soft);background:none;border:none;cursor:pointer;padding:8px;border-radius:8px;width:100%}
+.sb-logout:hover{color:#c0392b}
+.sb-logout svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+
+.main{margin-left:var(--sidebar-w);flex:1;min-width:0}
+.main-head{background:#fff;border-bottom:1px solid var(--line);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30}
+.main-head h1{font-size:1.35rem;color:var(--ink)}
+.main-body{padding:24px 28px}
+
+/* Toggle móvil */
+.menu-toggle{display:none;background:none;border:none;cursor:pointer;padding:6px}
+.menu-toggle svg{width:24px;height:24px;stroke:var(--ink);fill:none;stroke-width:2}
+
+/* ===== LOGIN ===== */
+.login{max-width:380px;margin:80px auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:36px;text-align:center}
+.login img{max-width:180px;margin:0 auto 18px;display:block}
+.login h2{font-size:1.3rem;margin-bottom:8px}
+.login p{color:var(--ink-soft);font-size:.94rem;margin-bottom:22px}
+.login input{width:100%;padding:13px 16px;border:1.5px solid var(--line);border-radius:10px;font-family:var(--b);font-size:1rem;margin-bottom:14px}
+.login input:focus{outline:none;border-color:var(--fresh)}
+.btn{background:var(--fresh);color:#04231f;font-family:var(--d);font-weight:600;border:none;padding:13px 24px;border-radius:10px;cursor:pointer;font-size:1rem}
+.btn:hover{filter:brightness(1.05)}
+.btn-block{width:100%}
+.btn-blue{background:var(--brand);color:#fff}
+.btn-blue:hover{background:var(--brand-deep);filter:none}
+.btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--brand);color:var(--brand);filter:none}
+.err{color:#c0392b;font-size:.9rem;margin-top:8px;min-height:18px}
+.link-btn{font-family:var(--d);font-weight:600;font-size:.85rem;color:var(--brand);background:none;border:none;cursor:pointer;margin-top:14px;text-decoration:underline}
+
+/* ===== PANELES ===== */
+.pane{display:none}
+.pane.on{display:block}
+
+/* ===== SOLICITUDES RECIBIDAS ===== */
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:#fff;border:1.5px solid var(--line);border-radius:100px;padding:8px 16px;font-family:var(--d);font-weight:600;font-size:.88rem;cursor:pointer;color:var(--ink-soft)}
+.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.count{background:var(--fresh);color:#04231f;border-radius:100px;padding:2px 9px;font-size:.78rem;margin-left:6px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:14px;border-left:4px solid var(--fresh)}
+.card.gestionada{border-left-color:var(--line);opacity:.72}
+.card .top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.card .nombre{font-family:var(--d);font-weight:700;font-size:1.15rem}
+.card .fecha{color:var(--ink-soft);font-size:.85rem}
+.badge{display:inline-block;background:var(--cloud);color:var(--brand-deep);font-family:var(--d);font-weight:600;font-size:.76rem;padding:4px 12px;border-radius:100px;margin-left:8px}
+.datos{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:12px;font-size:.95rem}
+.datos a{color:var(--brand);font-weight:600}
+.datos .lab{color:var(--ink-soft);font-size:.78rem;display:block}
+.msg{background:var(--cloud);border-radius:10px;padding:14px;font-size:.95rem;margin-bottom:14px;white-space:pre-wrap}
+.acciones{display:flex;gap:10px;flex-wrap:wrap}
+.mini{font-family:var(--d);font-weight:600;font-size:.85rem;border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;cursor:pointer;color:var(--ink)}
+.mini:hover{border-color:var(--brand);color:var(--brand)}
+.mini.green{border-color:var(--fresh);color:var(--fresh)}
+.mini.red{border-color:#e3a8a8;color:#c0392b}
+.empty{text-align:center;color:var(--ink-soft);padding:60px 20px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.hide{display:none}
+
+/* ===== CREAR PRESUPUESTO ===== */
+.tpl-pick{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.tpl{flex:1;min-width:200px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:18px 20px;cursor:pointer;display:flex;align-items:center;gap:14px}
+.tpl.on{border-color:var(--brand);background:var(--mist)}
+.tpl .ic{width:44px;height:44px;border-radius:11px;background:var(--mist);display:grid;place-items:center;flex-shrink:0}
+.tpl.on .ic{background:var(--brand)}
+.tpl .ic svg{width:24px;height:24px;stroke:var(--brand);fill:none;stroke-width:2}
+.tpl.on .ic svg{stroke:#fff}
+.tpl b{font-family:var(--d);font-size:1.05rem;display:block}
+.tpl span{font-size:.84rem;color:var(--ink-soft)}
+.block{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:18px}
+.block h3{font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.block h3 .n{width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:.82rem;display:grid;place-items:center;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fld{margin-bottom:14px}
+.fld label{font-family:var(--d);font-weight:600;font-size:.84rem;display:block;margin-bottom:5px}
+.fld input,.fld textarea,.fld select{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:9px;font-family:var(--b);font-size:.96rem;color:var(--ink);background:#fff}
+.fld input:focus,.fld textarea:focus,.fld select:focus{outline:none;border-color:var(--fresh)}
+.fld textarea{resize:vertical;min-height:80px}
+.actions-bar{position:sticky;bottom:16px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;box-shadow:0 -6px 24px -16px rgba(10,58,110,.4)}
+.actions-bar .hint{flex:1;min-width:180px;font-size:.84rem;color:var(--ink-soft)}
+
+/* ===== BLOG (Decap) ===== */
+#pane-blog{padding:0}
+#blog-intro{color:var(--ink-soft);margin-bottom:16px}
+#nc-root{min-height:80vh;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;position:relative}
+#nc-root:empty::after{content:"Cargando el editor del blog…";display:block;padding:40px;text-align:center;color:var(--ink-soft)}
+#nc-root > div{position:relative !important}
+#nc-root [class*="ToolbarContainer"]{position:absolute !important}
+
+/* ===== POWERBI ===== */
+.pbi-wrap{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.pbi-frame{width:100%;height:80vh;min-height:600px;border:none;display:block}
+.pbi-help{background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px}
+.pbi-help h3{margin-bottom:12px}
+.pbi-help ol{margin:12px 0 16px 22px}
+.pbi-help li{margin-bottom:8px;color:var(--ink-soft)}
+.pbi-help code{background:var(--cloud);padding:2px 7px;border-radius:5px;font-size:.88em;color:var(--brand-deep)}
+
+/* ===== CALCULADORA ===== */
+.calc-grid{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+.calc-result{position:sticky;top:90px;background:linear-gradient(135deg,var(--brand-deep),var(--brand));color:#fff;border-radius:16px;padding:28px;text-align:center}
+.calc-result .lab{font-family:var(--d);font-weight:600;font-size:.88rem;opacity:.85;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.calc-result .val{font-family:var(--d);font-weight:800;font-size:2.6rem;line-height:1.1;color:#fff;margin-bottom:6px}
+.calc-result .val-iva{font-size:1.05rem;opacity:.85;margin-bottom:16px}
+.calc-result .src{font-size:.82rem;opacity:.8;background:rgba(255,255,255,.1);padding:8px 12px;border-radius:8px;margin-top:14px}
+.calc-table{width:100%;border-collapse:collapse}
+.calc-table th{font-family:var(--d);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);text-align:left;padding:10px 12px;border-bottom:2px solid var(--line);background:var(--cloud)}
+.calc-table th:nth-child(2){text-align:right;width:130px}
+.calc-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.calc-table td:nth-child(2){text-align:right;font-family:var(--d);font-weight:600}
+.calc-table tr.section td{background:var(--mist);font-family:var(--d);font-weight:700;color:var(--brand-deep);font-size:.9rem;text-transform:uppercase;letter-spacing:.04em}
+.calc-table tr.result td{background:#FFF8E1;font-weight:700}
+.calc-table input{width:100%;max-width:140px;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;font-family:var(--b);font-size:.95rem;text-align:right}
+.calc-table input:focus{outline:none;border-color:var(--fresh)}
+.calc-table .nota{display:block;font-size:.78rem;color:var(--ink-soft);font-weight:400;margin-top:2px}
+.calc-actions{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.calc-status{font-size:.85rem;color:var(--ink-soft)}
+
+/* ===== CONTROL HORARIO ===== */
+.sb-sep{font-family:var(--d);font-weight:700;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;
+  color:#9CB3C4;padding:16px 14px 7px;margin-top:6px;border-top:1px solid var(--line)}
+.barra{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;background:#fff;border:1px solid var(--line);
+  border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.barra .f{display:flex;flex-direction:column;gap:4px}
+.barra label{font-family:var(--d);font-weight:600;font-size:.76rem;color:var(--ink-soft)}
+.barra input,.barra select{padding:9px 11px;border:1.5px solid var(--line);border-radius:9px;font-family:var(--b);
+  font-size:.92rem;background:#fff;color:var(--ink)}
+.barra input:focus,.barra select:focus{outline:none;border-color:var(--fresh)}
+.barra .sep{flex:1}
+.rapidos{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.rapidos button{font-family:var(--d);font-weight:600;font-size:.83rem;background:#fff;border:1.5px solid var(--line);
+  color:var(--ink-soft);border-radius:100px;padding:7px 14px;cursor:pointer}
+.rapidos button:hover{border-color:var(--brand);color:var(--brand)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.kpi.destacado{background:linear-gradient(135deg,var(--brand-deep),var(--brand));border:none;color:#fff}
+.kpi .l{font-family:var(--d);font-weight:600;font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--ink-soft);margin-bottom:4px}
+.kpi.destacado .l{color:rgba(255,255,255,.82)}
+.kpi .v{font-family:var(--d);font-weight:800;font-size:1.75rem;line-height:1.1}
+.tabla-wrap{background:#fff;border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:.9rem;min-width:840px}
+table.t th{font-family:var(--d);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);
+  text-align:left;padding:11px 12px;border-bottom:2px solid var(--line);background:var(--cloud);white-space:nowrap;
+  position:sticky;top:0;z-index:2}
+table.t td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.t tbody tr:hover{background:var(--cloud)}
+table.t tr.finde td{background:#FFFDF3}
+table.t tr.finde:hover td{background:#FFF8E4}
+table.t td.num{text-align:right;font-family:var(--d);font-weight:600;white-space:nowrap}
+table.t tfoot td{font-family:var(--d);font-weight:700;background:var(--mist);border-top:2px solid var(--line);
+  border-bottom:none;position:sticky;bottom:0}
+.pill{display:inline-block;font-family:var(--d);font-weight:700;font-size:.7rem;padding:3px 9px;border-radius:100px;
+  letter-spacing:.02em}
+.pill.fin{background:#FFF3D6;color:#8A5A00}
+.pill.rev{background:#E4F7F3;color:#0B7A6E}
+.pill.no{background:#FDEEEC;color:#9E2B1D}
+.pill.si{background:#E4F7F3;color:#0B7A6E}
+.in-precio{width:78px;padding:5px 8px;border:1.5px solid var(--line);border-radius:7px;font-family:var(--b);
+  font-size:.88rem;text-align:right;background:#fff;color:var(--ink)}
+.in-precio:focus{outline:none;border-color:var(--fresh)}
+.acc-mini{background:none;border:none;color:var(--brand);font-family:var(--d);font-weight:600;font-size:.8rem;
+  cursor:pointer;padding:2px 5px;text-decoration:underline}
+.acc-mini.rojo{color:#c0392b}
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.ficha{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+.ficha.off{opacity:.62}
+.ficha .cab{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.ficha h4{font-size:1.1rem}
+.ficha .meta{font-size:.86rem;color:var(--ink-soft);margin-bottom:12px}
+.ficha .asig{background:var(--cloud);border-radius:10px;padding:11px 13px;font-size:.86rem;margin-bottom:13px}
+.ficha .asig b{font-family:var(--d);display:block;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--ink-soft);margin-bottom:4px}
+.ficha .botones{display:flex;gap:8px;flex-wrap:wrap}
+.modal-fondo{position:fixed;inset:0;background:rgba(12,42,62,.55);display:flex;align-items:center;justify-content:center;
+  z-index:100;padding:16px}
+/* .hide se declara antes que esta regla, así que hay que reforzarla o la
+   ventana emergente se mostraría vacía nada más cargar la página */
+.modal-fondo.hide{display:none}
+.modal-caja{background:#fff;border-radius:18px;padding:26px;width:100%;max-width:520px;
+  max-height:92vh;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain}
+.modal-caja h3{font-size:1.2rem;margin-bottom:18px}
+.modal-caja .botonera{display:flex;gap:10px;margin-top:8px}
+.modal-caja .botonera .btn{flex:1;padding:12px}
+.checks{max-height:230px;overflow-y:auto;border:1.5px solid var(--line);border-radius:10px;padding:6px}
+.checks label{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:.94rem;cursor:pointer}
+.checks label:hover{background:var(--cloud)}
+.checks input{width:17px;height:17px;accent-color:var(--brand)}
+.nota-info{background:var(--mist);border-left:3px solid var(--brand);border-radius:0 10px 10px 0;padding:13px 16px;
+  font-size:.89rem;color:var(--ink-soft);margin-bottom:16px}
+
+/* ===== VISTA MÓVIL DEL CONTROL HORARIO ===== */
+.reg{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin-bottom:10px}
+.reg.finde{border-color:#F0DCA8;background:#FFFDF6}
+.reg-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:3px}
+.reg-top b{font-family:var(--d);font-size:1rem;text-transform:capitalize}
+.reg-top .h{font-family:var(--d);font-weight:800;font-size:1.15rem;color:var(--brand);white-space:nowrap}
+.reg-quien{font-size:.92rem;font-weight:600}
+.reg-cli{font-size:.9rem;color:var(--ink-soft)}
+.reg-hr{font-size:.9rem;color:var(--ink-soft);margin-top:2px}
+.reg-pie{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin-top:11px;padding-top:11px;border-top:1px solid var(--line)}
+.reg.finde .reg-pie{border-top-color:#F0DCA8}
+.reg-pie label{font-family:var(--d);font-weight:600;font-size:.78rem;color:var(--ink-soft);
+  display:flex;align-items:center;gap:7px}
+.reg-pie .imp{font-family:var(--d);font-weight:700;font-size:1.02rem}
+.reg-acc{display:flex;gap:8px;margin-top:11px}
+.reg-acc button{flex:1;background:var(--cloud);border:1px solid var(--line);border-radius:9px;padding:11px 6px;
+  font-family:var(--d);font-weight:600;font-size:.84rem;color:var(--brand)}
+.reg-acc button.rojo{color:#c0392b}
+.resumen-movil{background:linear-gradient(135deg,var(--brand-deep),var(--brand));color:#fff;border-radius:14px;
+  padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:4px}
+.resumen-movil .l{font-family:var(--d);font-weight:600;font-size:.8rem;opacity:.85}
+.resumen-movil .v{font-family:var(--d);font-weight:800;font-size:1.5rem;line-height:1.15}
+
+@media (max-width:760px){
+  .barra{padding:13px;gap:11px}
+  .barra .f{flex:1 1 calc(50% - 6px);min-width:0}
+  .barra .f select,.barra .f input{width:100%}
+  .barra .f.ancho{flex-basis:100%}
+  .barra .sep{display:none}
+  .barra > .btn{flex:1 1 100%;text-align:center}
+  .rapidos{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .rapidos::-webkit-scrollbar{display:none}
+  .rapidos button{flex-shrink:0}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{padding:13px 14px}
+  .kpi .v{font-size:1.4rem}
+  .tabla-wrap{background:none;border:none;border-radius:0;overflow:visible}
+  .tarjetas{grid-template-columns:1fr}
+  .modal-fondo{align-items:flex-end;padding:0}
+  .modal-caja{border-radius:20px 20px 0 0;max-height:94vh;
+    padding:24px 18px calc(26px + env(safe-area-inset-bottom))}
+  /* 16px evita que iOS haga zoom al tocar un campo */
+  .barra input,.barra select,.modal-caja input,.modal-caja select,.in-precio,
+  .fld input,.fld select,.fld textarea,.calc-table input{font-size:16px}
+  .rapidos button{min-height:42px;padding:9px 16px}
+  .acc-mini{padding:8px 6px;display:inline-block}
+  .in-precio{width:92px;padding:9px 10px}
+}
+
+@media (max-width:900px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .menu-toggle{display:block}
+  .calc-grid{grid-template-columns:1fr}
+  .calc-result{position:static}
+}
+@media (max-width:560px){
+  .main-body{padding:16px}
+  .grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN (solo para Presupuestos/CMS; el Blog usa su propio login de GitHub) -->
+<div id="login" class="login">
+  <img src="/img/logo-mini.png" alt="Limpiezas Castellón">
+  <h2>Acceso al panel</h2>
+  <p>Introduce la contraseña para gestionar presupuestos, ver el panel de PowerBI y la calculadora.<br>Para el blog podrás entrar con GitHub.</p>
+  <input id="pass" type="password" placeholder="Contraseña" onkeydown="if(event.key===&apos;Enter&apos;)entrar()">
+  <button class="btn btn-block" onclick="entrar()">Entrar</button>
+  <div id="loginErr" class="err"></div>
+  <button class="link-btn" onclick="soloBlog()">Solo quiero gestionar el blog →</button>
+</div>
+
+<!-- APP completa -->
+<div id="app" class="app hide">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <img src="/img/logo-mini.png" alt="Limpiezas Castellón">
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-item" data-tab="blog" onclick="verTab(&apos;blog&apos;)">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Blog
+      </div>
+      <div class="sb-item on" data-tab="solicitudes" onclick="verTab(&apos;solicitudes&apos;)">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Presupuestos recibidos
+      </div>
+      <div class="sb-item" data-tab="crear" onclick="verTab(&apos;crear&apos;)">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>
+        Crear presupuesto
+      </div>
+      <div class="sb-item" data-tab="powerbi" onclick="verTab(&apos;powerbi&apos;)">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+        Panel Power BI
+      </div>
+      <div class="sb-item" data-tab="calc" onclick="verTab(&apos;calc&apos;)">
+        <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h2M12 14h.01M16 14h.01M8 18h2M12 18h.01M16 18h.01"/></svg>
+        Calculadora precio/hora
+      </div>
+      <div class="sb-sep">Control horario</div>
+      <div class="sb-item" data-tab="horas" onclick="verTab(&apos;horas&apos;)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Horas registradas
+      </div>
+      <div class="sb-item" data-tab="empleadas" onclick="verTab(&apos;empleadas&apos;)">
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        Empleadas
+      </div>
+      <div class="sb-item" data-tab="clientes" onclick="verTab(&apos;clientes&apos;)">
+        <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        Clientes
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <button class="sb-logout" onclick="salir()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Cerrar sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="main-head">
+      <button class="menu-toggle" onclick="document.getElementById(&apos;sidebar&apos;).classList.toggle(&apos;open&apos;)">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 id="page-title">Presupuestos recibidos</h1>
+      <span></span>
+    </header>
+    <div class="main-body">
+
+      <!-- ===== BLOG ===== -->
+      <div id="pane-blog" class="pane">
+        <p id="blog-intro">Editor del blog. La primera vez te pedirá iniciar sesión con GitHub. Tus cambios se publican solos en la web.</p>
+        <div id="nc-root"></div>
+      </div>
+
+      <!-- ===== SOLICITUDES RECIBIDAS ===== -->
+      <div id="pane-solicitudes" class="pane on">
+        <div class="filters">
+          <div class="chip on" data-f="todas" onclick="filtrar(&apos;todas&apos;,this)">Todas <span id="cTodas" class="count">0</span></div>
+          <div class="chip" data-f="nueva" onclick="filtrar(&apos;nueva&apos;,this)">Nuevas <span id="cNuevas" class="count">0</span></div>
+          <div class="chip" data-f="gestionada" onclick="filtrar(&apos;gestionada&apos;,this)">Gestionadas</div>
+        </div>
+        <div id="lista" style="margin-top:20px"></div>
+      </div>
+
+      <!-- ===== CREAR PRESUPUESTO ===== -->
+      <div id="pane-crear" class="pane">
+        <p style="color:var(--ink-soft);margin-bottom:18px">Elige una plantilla. Puedes editar todos los textos antes de generar el PDF (con vuestro logo) o enviarlo por email.</p>
+        <div class="tpl-pick">
+          <div class="tpl on" id="tpl-oficinas" onclick="elegirPlantilla(&apos;oficinas&apos;)">
+            <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+            <div><b>Oficinas / Empresas</b><span>Limpieza por horas en instalaciones</span></div>
+          </div>
+          <div class="tpl" id="tpl-comunidades" onclick="elegirPlantilla(&apos;comunidades&apos;)">
+            <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg></div>
+            <div><b>Comunidades</b><span>Portales, escaleras, zonas comunes</span></div>
+          </div>
+        </div>
+        <div class="block">
+          <h3><span class="n">1</span> Destinatario y fecha</h3>
+          <div class="grid2">
+            <div class="fld"><label>Cliente / instalación</label><input id="c-nombre" placeholder="Ej: COMUNIDAD DE PROPIETARIOS / EMPRESA"></div>
+            <div class="fld"><label>Dirección del cliente</label><input id="c-direccion" placeholder="Calle, número, población"></div>
+          </div>
+          <div class="grid2">
+            <div class="fld"><label>Fecha</label><input id="p-fecha" type="date"></div>
+            <div class="fld"><label>Saludo</label><input id="p-saludo" value="Distinguidos Sr.:"></div>
+          </div>
+          <div class="fld"><label>Email del cliente</label><input id="c-email" type="email" placeholder="cliente@email.com"></div>
+        </div>
+        <div class="block"><h3><span class="n">2</span> Presentación</h3><div class="fld"><textarea id="p-intro" style="min-height:70px"></textarea></div></div>
+        <div class="block"><h3><span class="n">3</span> Descripción del trabajo</h3>
+          <p style="color:var(--ink-soft);font-size:.86rem;margin-bottom:10px">Una línea por tarea.</p>
+          <div class="fld"><textarea id="p-trabajo" style="min-height:130px"></textarea></div></div>
+        <div class="block"><h3><span class="n">4</span> Importe</h3><div class="fld"><input id="p-importe" placeholder="Ej: IMPORTE: 15.-€/hora."></div></div>
+        <div class="block"><h3><span class="n">5</span> Notas y condiciones</h3>
+          <p style="color:var(--ink-soft);font-size:.86rem;margin-bottom:10px">Una línea por condición.</p>
+          <div class="fld"><textarea id="p-notas" style="min-height:160px"></textarea></div></div>
+        <div class="actions-bar">
+          <span class="hint">El PDF se descarga con vuestro logo. Al enviar por email se abre tu correo con el texto listo.</span>
+          <button class="btn btn-ghost" onclick="generarPDF(false)">Vista previa PDF</button>
+          <button class="btn btn-blue" onclick="generarPDF(true)">Descargar PDF</button>
+          <button class="btn" onclick="enviarEmail()">Enviar por email</button>
+        </div>
+      </div>
+
+      <!-- ===== POWERBI ===== -->
+      <div id="pane-powerbi" class="pane">
+        <div id="pbi-container"></div>
+      </div>
+
+      <!-- ===== CALCULADORA COSTES LABORALES ===== -->
+      <div id="pane-calc" class="pane">
+        <p style="color:var(--ink-soft);margin-bottom:18px">Calcula el coste laboral de una empleada/o según convenio de limpieza, sus horas semanales, antigüedad y mes. Los datos salen del Excel <code style="background:var(--cloud);padding:2px 6px;border-radius:4px">/datos/costes-laborales.xlsm</code>: si actualizas las tablas del Excel (SMI, %SS, días laborables…), aquí se actualiza al recargar.</p>
+
+        <div class="block">
+          <h3><span class="n">1</span> Datos del cálculo</h3>
+          <div class="grid2">
+            <div class="fld">
+              <label>Nº horas/semana</label>
+              <input id="calc-horas" type="number" min="1" max="39" step="1" value="6" oninput="recalcularLaborales()">
+            </div>
+            <div class="fld">
+              <label>Fecha de antigüedad</label>
+              <input id="calc-antiguedad" type="date" value="2015-01-03" oninput="recalcularLaborales()">
+            </div>
+          </div>
+          <div class="fld">
+            <label>Mes del cálculo</label>
+            <select id="calc-mes" onchange="recalcularLaborales()">
+              <option value="0">Enero</option>
+              <option value="1">Febrero</option>
+              <option value="2">Marzo</option>
+              <option value="3">Abril</option>
+              <option value="4">Mayo</option>
+              <option value="5">Junio</option>
+              <option value="6">Julio</option>
+              <option value="7">Agosto</option>
+              <option value="8">Septiembre</option>
+              <option value="9">Octubre</option>
+              <option value="10">Noviembre</option>
+              <option value="11">Diciembre</option>
+            </select>
+          </div>
+          <div class="calc-actions" style="margin-top:14px">
+            <button class="btn btn-ghost" onclick="cargarExcelCostes(true)">↻ Recargar desde Excel</button>
+            <span class="calc-status" id="calc-status">Cargando datos del Excel…</span>
+          </div>
+        </div>
+
+        <div class="calc-grid">
+          <div>
+            <div class="block">
+              <h3><span class="n">2</span> Desglose salarial</h3>
+              <table class="calc-table">
+                <tbody id="calc-salario">
+                  <tr><td colspan="2" style="text-align:center;padding:20px;color:var(--ink-soft)">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="block">
+              <h3><span class="n">3</span> Cotización Seguridad Social</h3>
+              <table class="calc-table">
+                <tbody id="calc-ss">
+                  <tr><td colspan="2" style="text-align:center;padding:20px;color:var(--ink-soft)">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="calc-result" id="calc-result">
+            <div class="lab">Coste total empresa</div>
+            <div class="val" id="calc-coste-total">— €</div>
+            <div style="border-top:1px solid rgba(255,255,255,.2);margin:14px 0 12px"></div>
+            <div class="lab" style="margin-top:0">Bruto mensual</div>
+            <div style="font-family:var(--d);font-weight:700;font-size:1.4rem;color:#fff;margin-bottom:10px" id="calc-bruto">— €</div>
+            <div class="lab">SS empresa</div>
+            <div style="font-family:var(--d);font-weight:700;font-size:1.2rem;color:#fff;margin-bottom:10px" id="calc-ss-emp">— €</div>
+            <div class="lab">Neto trabajador/a</div>
+            <div style="font-family:var(--d);font-weight:700;font-size:1.4rem;color:#fff" id="calc-neto">— €</div>
+            <div class="src" style="margin-top:18px">
+              <div id="calc-info-antig" style="font-size:.85rem">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== HORAS FICHADAS ===== -->
+      <div id="pane-horas" class="pane">
+        <div class="rapidos">
+          <button onclick="rangoRapido('mes')">Este mes</button>
+          <button onclick="rangoRapido('mesant')">Mes pasado</button>
+          <button onclick="rangoRapido('semana')">Esta semana</button>
+          <button onclick="rangoRapido('ano')">Todo el año</button>
+        </div>
+        <div class="barra">
+          <div class="f"><label>Desde</label><input id="h-desde" type="date" onchange="cargarHorasAdmin()"></div>
+          <div class="f"><label>Hasta</label><input id="h-hasta" type="date" onchange="cargarHorasAdmin()"></div>
+          <div class="f ancho"><label>Empleada</label><select id="h-emp" onchange="cargarHorasAdmin()"><option value="">Todas</option></select></div>
+          <div class="f ancho"><label>Cliente</label><select id="h-cli" onchange="cargarHorasAdmin()"><option value="">Todos</option></select></div>
+          <div class="f"><label>Días</label><select id="h-dias" onchange="pintarHorasAdmin()">
+            <option value="todos">Todos</option>
+            <option value="laborables">Solo laborables</option>
+            <option value="finde">Solo fines de semana</option>
+          </select></div>
+          <div class="sep"></div>
+          <button class="btn btn-blue" style="padding:10px 18px;font-size:.92rem" onclick="exportarExcel()">Exportar a Excel</button>
+          <button class="btn btn-ghost" style="padding:10px 18px;font-size:.92rem" onclick="abrirFichaje()">Añadir horas a mano</button>
+        </div>
+        <div class="kpis" id="h-kpis"></div>
+        <div class="tabla-wrap"><div id="h-tabla"></div></div>
+        <p style="color:var(--ink-soft);font-size:.86rem;margin-top:14px">
+          El precio/hora se hereda del cliente, pero puedes cambiarlo línea a línea escribiendo directamente en la columna.
+          Al marcar una línea como <b>revisada</b>, la empleada ya no puede modificarla.
+        </p>
+      </div>
+
+      <!-- ===== EMPLEADAS ===== -->
+      <div id="pane-empleadas" class="pane">
+        <div class="nota-info">
+          Cada empleada entra en <b id="url-fichaje">/horas</b> con el usuario y la contraseña que le pongas aquí.
+          Rellena su parte cuando quiera (cada día, al acabar la semana o a fin de mes). Solo ve los clientes que le
+          asignes y sus horas de los últimos tres meses.
+        </div>
+        <div class="barra">
+          <div class="sep"></div>
+          <button class="btn btn-blue" style="padding:10px 18px;font-size:.92rem" onclick="abrirEmpleada()">Nueva empleada</button>
+        </div>
+        <div class="tarjetas" id="lista-empleadas"></div>
+      </div>
+
+      <!-- ===== CLIENTES ===== -->
+      <div id="pane-clientes" class="pane">
+        <div class="nota-info">
+          Los clientes que crees aquí son los que podrás asignar a cada empleada. El precio/hora que pongas se aplicará
+          automáticamente a las horas nuevas que se apunten en ese cliente.
+        </div>
+        <div class="barra">
+          <div class="sep"></div>
+          <button class="btn btn-blue" style="padding:10px 18px;font-size:.92rem" onclick="abrirCliente()">Nuevo cliente</button>
+        </div>
+        <div class="tarjetas" id="lista-clientes"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="modal-fichajes" class="modal-fondo hide" onclick="if(event.target===this)cerrarModalF()">
+  <div class="modal-caja" id="modal-fichajes-caja"></div>
+</div>
+
+<!-- Decap CMS (config y carga diferida) -->
+<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url">
+<link href="https://unpkg.com/decap-cms@^3.3.3/dist/main.css" rel="stylesheet">
+<script src="/admin-logo.js"></script>
+<script>
+/* ====== CONFIG POWER BI ======
+   Pega aquí el enlace de "Insertar" → "Publicar en la web" que te da Power BI.
+   Si lo dejas vacío, la pestaña mostrará instrucciones de cómo conseguirlo. */
+const POWERBI_EMBED_URL = "";  // ej: "https://app.powerbi.com/view?r=eyJrIjoi..."
+
+/* ============== LÓGICA DEL PANEL ============== */
+
+
+/* ============ DATOS DE LA EMPRESA (edítalos si cambian) ============ */
+const EMPRESA = {
+  razonSocial: "ALBIOL PROJECTS",
+  membrete: ["Pol. Ind. Ciudad del Transporte", "C/ Gran Bretaña 53.", "Castellón."],
+  marca: "Limpiezas CASTELLÓN",
+  nif: "B-44.533.719",
+  direccion: "C/ Enmedio, 22 6º (12001) Castellón",
+  telefono: "(+34) 964 900 046",
+  email: "correo@limpiezascastellon.es",
+  registro: "Inscrita en el Registro Mercantil de Castellón, Hoja CS-42696 Tomo 1803 Libro 1363 Folio 191 Inscripción 1"
+};
+
+/* Plantillas en formato carta (como vuestro presupuesto real) */
+const PLANTILLAS = {
+  oficinas: {
+    intro: "Atendiendo su amable petición de presupuesto con relación a los trabajos de limpieza de sus instalaciones. Remitimos nuestra mejor oferta.\n\nSin otro particular, aprovechamos la ocasión para saludarle atentamente.",
+    trabajo: "Trabajos de limpieza por horas.\nBarrido y fregado del pavimento, con productos desinfectantes adecuados. Además de tareas que le sean asignadas por la empresa.\nDesempolvado de todo tipo de mobiliario y equipos existentes, limpieza y desinfección, que se realizará con bayetas humedecidas, vaciado de papeleras, etc.",
+    importe: "IMPORTE: 15.-€/hora.",
+    notas: "I.V.A. no incluido.\nForma de pago mensual domiciliada.\nLa empresa tiene a todo su personal afiliado al régimen General de la Seguridad Social.\nLa empresa dispone de un seguro de Responsabilidad Civil contratado con la compañía ZURICH.\nProductos y materiales propios del mantenimiento incluidos. Excluidos (papel higiénico, jabón de manos, bolsas de basura, etc).\nPresupuesto y cálculos realizados sin la subrogación del personal actual.\nExcluido servicio de lavandería."
+  },
+  comunidades: {
+    intro: "Atendiendo su amable petición de presupuesto con relación a los trabajos de limpieza de las zonas comunes de su comunidad. Remitimos nuestra mejor oferta.\n\nSin otro particular, aprovechamos la ocasión para saludarle atentamente.",
+    trabajo: "Barrido y fregado de portal, escaleras y rellanos, con productos desinfectantes adecuados.\nLimpieza y desinfección de ascensor (suelo, espejos y botonera).\nDesempolvado de buzones, barandillas y elementos de las zonas comunes.\nLimpieza de cristales de las zonas comunes.\nBarrido y baldeo de garaje (según frecuencia acordada).",
+    importe: "IMPORTE: __,-€/mes.",
+    notas: "I.V.A. no incluido.\nForma de pago mensual domiciliada.\nLa empresa tiene a todo su personal afiliado al régimen General de la Seguridad Social.\nLa empresa dispone de un seguro de Responsabilidad Civil contratado con la compañía ZURICH.\nProductos y materiales propios del mantenimiento incluidos. Excluidos (papel higiénico, jabón de manos, bolsas de basura, etc).\nPresupuesto y cálculos realizados sin la subrogación del personal actual."
+  }
+};
+
+let KEY = sessionStorage.getItem("lc_admin_key") || "";
+let datos = [];
+let filtro = "todas";
+let plantillaActual = "oficinas";
+
+if (KEY) { mostrarDash(); cargar(); }
+
+/* ---------- login ---------- */
+function entrar(){
+  KEY = document.getElementById("pass").value.trim();
+  if(!KEY) return;
+  document.getElementById("loginErr").textContent = "Comprobando…";
+  cargar(true);
+}
+function salir(){ sessionStorage.removeItem("lc_admin_key"); KEY=""; location.reload(); }
+
+/* ---------- pestañas ---------- */
+
+/* ================= PESTAÑA 1: SOLICITUDES ================= */
+async function cargar(esLogin){
+  try{
+    const r = await fetch("/api/solicitudes", { headers: { "x-admin-key": KEY } });
+    if(r.status === 401){ document.getElementById("loginErr").textContent = "Contraseña incorrecta."; return; }
+    const j = await r.json();
+    datos = j.solicitudes || [];
+    if(esLogin){ sessionStorage.setItem("lc_admin_key", KEY); mostrarDash(); }
+    render();
+  }catch(e){ document.getElementById("loginErr").textContent = "Error de conexión."; }
+}
+function filtrar(f, el){
+  filtro = f;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));
+  el.classList.add("on"); render();
+}
+function esc(s){ return (s||"").replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function render(){
+  const nuevas = datos.filter(d=>d.estado!=="gestionada").length;
+  document.getElementById("cTodas").textContent = datos.length;
+  document.getElementById("cNuevas").textContent = nuevas;
+  let lista = datos;
+  if(filtro==="nueva") lista = datos.filter(d=>d.estado!=="gestionada");
+  if(filtro==="gestionada") lista = datos.filter(d=>d.estado==="gestionada");
+  const cont = document.getElementById("lista");
+  if(lista.length===0){ cont.innerHTML = '<div class="empty">No hay solicitudes en esta vista.</div>'; return; }
+  cont.innerHTML = lista.map(d=>{
+    const fecha = new Date(d.fecha).toLocaleString("es-ES",{day:"2-digit",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"});
+    const g = d.estado==="gestionada";
+    return `<div class="card ${g?'gestionada':''}">
+      <div class="top">
+        <div class="nombre">${esc(d.nombre)} ${g?'<span class="badge">Gestionada</span>':'<span class="badge" style="background:var(--fresh);color:#04231f">Nueva</span>'}</div>
+        <div class="fecha">${fecha}</div>
+      </div>
+      <div class="datos">
+        ${d.telefono?`<div><span class="lab">Teléfono</span><a href="tel:${esc(d.telefono)}">${esc(d.telefono)}</a></div>`:''}
+        ${d.email?`<div><span class="lab">Email</span><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></div>`:''}
+        ${d.servicio?`<div><span class="lab">Servicio</span>${esc(d.servicio)}</div>`:''}
+      </div>
+      ${d.mensaje?`<div class="msg">${esc(d.mensaje)}</div>`:''}
+      <div class="acciones">
+        ${d.telefono?`<a class="mini green" href="${'https://wa.me/'+d.telefono.replace(/[^0-9]/g,'')}" target="_blank">WhatsApp</a>`:''}
+        ${g?`<button class="mini" onclick="accion('${d.id}','nueva')">Marcar como nueva</button>`:`<button class="mini green" onclick="accion('${d.id}','gestionada')">Marcar gestionada</button>`}
+        <button class="mini red" onclick="borrar('${d.id}')">Borrar</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+async function accion(id, accion){
+  await fetch("/api/solicitudes", { method:"POST", headers:{ "Content-Type":"application/json", "x-admin-key":KEY }, body: JSON.stringify({ id, accion }) });
+  const s = datos.find(d=>d.id===id); if(s) s.estado = accion; render();
+}
+async function borrar(id){
+  if(!confirm("¿Seguro que quieres borrar esta solicitud? No se puede deshacer.")) return;
+  await fetch("/api/solicitudes", { method:"POST", headers:{ "Content-Type":"application/json", "x-admin-key":KEY }, body: JSON.stringify({ id, accion:"borrar" }) });
+  datos = datos.filter(d=>d.id!==id); render();
+}
+
+/* ================= PESTAÑA 2: CREAR PRESUPUESTO ================= */
+function initPresupuesto(){
+  document.getElementById("p-fecha").value = new Date().toISOString().slice(0,10);
+  elegirPlantilla("oficinas");
+}
+
+function elegirPlantilla(tipo){
+  plantillaActual = tipo;
+  document.getElementById("tpl-oficinas").classList.toggle("on", tipo==="oficinas");
+  document.getElementById("tpl-comunidades").classList.toggle("on", tipo==="comunidades");
+  const p = PLANTILLAS[tipo];
+  document.getElementById("p-intro").value = p.intro;
+  document.getElementById("p-trabajo").value = p.trabajo;
+  document.getElementById("p-importe").value = p.importe;
+  document.getElementById("p-notas").value = p.notas;
+}
+
+function val(id){ return (document.getElementById(id).value || "").trim(); }
+function lineasDe(id){ return val(id).split("\n").map(s=>s.trim()).filter(Boolean); }
+
+function fechaLarga(iso){
+  if(!iso) return "";
+  const meses=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const d=new Date(iso);
+  return "Castellón, "+d.getDate()+" de "+meses[d.getMonth()]+" del "+d.getFullYear()+".";
+}
+
+function recogerDatos(){
+  return {
+    clienteNombre: val("c-nombre"),
+    clienteDireccion: val("c-direccion"),
+    clienteEmail: val("c-email"),
+    fecha: val("p-fecha"),
+    saludo: val("p-saludo"),
+    intro: val("p-intro"),
+    trabajo: lineasDe("p-trabajo"),
+    importe: val("p-importe"),
+    notas: lineasDe("p-notas")
+  };
+}
+
+/* ---------- generar PDF (formato carta, con logo) ---------- */
+function generarPDF(descargar){
+  const d = recogerDatos();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:"mm", format:"a4" });
+  const W=210, M=20;
+  const azulOsc=[10,58,110], gris=[70,85,98], negro=[30,40,50];
+  let y = 16;
+
+  // --- Logo arriba a la derecha ---
+  try{
+    if(window.LOGO_LIMPIEZAS){
+      // proporción del recorte ~520x235 -> ancho 62mm
+      const wLogo=62, hLogo=62*235/520;
+      doc.addImage(window.LOGO_LIMPIEZAS, "PNG", W-M-wLogo, y, wLogo, hLogo);
+    }
+  }catch(e){}
+
+  // --- Membrete (razón social) arriba a la izquierda ---
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(...negro);
+  doc.text(EMPRESA.razonSocial, M, y+5);
+  doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(...gris);
+  let yl = y+11;
+  EMPRESA.membrete.forEach(l=>{ doc.text(l, M, yl); yl+=4.6; });
+
+  // --- Fecha (debajo, alineada a la derecha) ---
+  y = 56;
+  doc.setFontSize(10.5); doc.setTextColor(...negro);
+  doc.text(fechaLarga(d.fecha), W-M, y, { align:"right" });
+
+  // --- Destinatario ---
+  y += 12;
+  if(d.clienteNombre){ doc.setFont("helvetica","bold"); doc.text(d.clienteNombre, M, y); y+=5.5; }
+  if(d.clienteDireccion){ doc.setFont("helvetica","normal"); doc.setTextColor(...gris); doc.text(d.clienteDireccion, M, y); y+=5.5; }
+
+  // --- Saludo ---
+  y += 6;
+  doc.setFont("helvetica","bold"); doc.setFontSize(10.5); doc.setTextColor(...negro);
+  doc.text(d.saludo || "Distinguidos Sr.:", M, y); y+=8;
+
+  // --- Intro ---
+  doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(...negro);
+  d.intro.split("\n").forEach(par=>{
+    if(par.trim()===""){ y+=4; return; }
+    const ls = doc.splitTextToSize(par, W-M*2);
+    doc.text(ls, M, y); y += ls.length*5.4;
+  });
+
+  // --- Firma marca ---
+  y += 8;
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(...azulOsc);
+  doc.text(EMPRESA.marca, W-M, y, { align:"right" }); y+=12;
+
+  // --- Descripción del trabajo ---
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(...azulOsc);
+  doc.text("DESCRIPCIÓN DEL TRABAJO", M, y); y+=7;
+  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(...negro);
+  d.trabajo.forEach(t=>{
+    const ls = doc.splitTextToSize("•  "+t, W-M*2-3);
+    doc.text(ls, M+1, y); y += ls.length*5.2 + 1.5;
+  });
+
+  // --- Importe ---
+  y += 5;
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.setTextColor(...negro);
+  doc.text(d.importe, W/2, y, { align:"center" }); y+=12;
+
+  // --- Notas ---
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(...azulOsc);
+  doc.text("NOTAS:", M, y); y+=7;
+  doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(...negro);
+  d.notas.forEach(n=>{
+    const ls = doc.splitTextToSize("-  "+n, W-M*2-3);
+    doc.text(ls, M+1, y); y += ls.length*5 + 1.2;
+  });
+
+  // --- Pie: registro mercantil ---
+  doc.setFont("helvetica","italic"); doc.setFontSize(7.5); doc.setTextColor(...gris);
+  const reg = doc.splitTextToSize(EMPRESA.registro, W-M*2);
+  doc.text(reg, W/2, 286, { align:"center" });
+
+  const arch = "Presupuesto_" + (d.clienteNombre||"cliente").replace(/[^a-zA-Z0-9]/g,"_").slice(0,30) + ".pdf";
+  if(descargar){ doc.save(arch); } else { window.open(doc.output("bloburl"), "_blank"); }
+  return arch;
+}
+
+/* ---------- enviar por email (abre el correo del usuario) ---------- */
+function enviarEmail(){
+  const d = recogerDatos();
+  if(!d.clienteEmail){
+    if(!confirm("No has puesto el email del cliente. ¿Abrir el correo igualmente para escribirlo a mano?")) return;
+  }
+  const arch = generarPDF(true);
+  const cuerpo =
+"Estimado/a cliente:\n\n" +
+"Le remitimos el presupuesto solicitado para los trabajos de limpieza.\n\n" +
+d.importe + "\n\n" +
+"Adjuntamos el presupuesto detallado en PDF (archivo \"" + arch + "\", recién descargado en su dispositivo).\n\n" +
+"Quedamos a su disposición para cualquier consulta.\n\n" +
+"Un cordial saludo,\n" +
+EMPRESA.marca + "\n" + EMPRESA.telefono + " · " + EMPRESA.email;
+
+  const asunto = "Presupuesto de limpieza · " + EMPRESA.marca;
+  const url = "mailto:" + encodeURIComponent(d.clienteEmail||"") +
+              "?subject=" + encodeURIComponent(asunto) +
+              "&body=" + encodeURIComponent(cuerpo);
+  setTimeout(()=>{ window.location.href = url; }, 400);
+  alert('Se ha descargado el PDF y se abrirá tu correo con el mensaje ya escrito.\n\nSolo tienes que ADJUNTAR el PDF descargado ("'+arch+'") antes de enviarlo.');
+}
+
+/* ====== Pestaña BLOG: cargar Decap solo una vez ====== */
+let decapCargado = false;
+function cargarDecap(){
+  if(decapCargado) return;
+  decapCargado = true;
+  window.CMS_MANUAL_INIT = true;
+  var s = document.createElement('script');
+  s.src = 'https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js';
+  s.onload = function(){
+    try {
+      var initFn = window.initCMS || (window.CMS && window.CMS.init);
+      if (initFn) initFn();
+    } catch(e){ console.error(e); }
+  };
+  document.body.appendChild(s);
+}
+function soloBlog(){
+  document.getElementById('login').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+  verTab('blog');
+}
+
+/* ====== Cambio de pestaña (sidebar) ====== */
+const TITULOS = {
+  blog: "Blog",
+  solicitudes: "Presupuestos recibidos",
+  crear: "Crear presupuesto",
+  powerbi: "Panel Power BI",
+  calc: "Calculadora precio/hora",
+  horas: "Horas registradas",
+  empleadas: "Empleadas",
+  clientes: "Clientes"
+};
+function verTab(t){
+  Object.keys(TITULOS).forEach(function(name){
+    var item = document.querySelector('.sb-item[data-tab="'+name+'"]');
+    var pane = document.getElementById('pane-'+name);
+    if(item) item.classList.toggle('on', t===name);
+    if(pane) pane.classList.toggle('on', t===name);
+  });
+  document.getElementById('page-title').textContent = TITULOS[t] || '';
+  if(t==='blog') cargarDecap();
+  if(t==='powerbi') montarPowerBI();
+  if(t==='calc') cargarCalculadora();
+  if(t==='horas' || t==='empleadas' || t==='clientes') abrirControlHorario(t);
+  // cerrar sidebar en móvil
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+/* ====== Override de mostrarDash para usar la nueva estructura ====== */
+function mostrarDash(){
+  document.getElementById('login').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+  initPresupuesto();
+}
+
+/* ============== POWER BI ============== */
+let pbiMontado = false;
+function montarPowerBI(){
+  if(pbiMontado) return;
+  pbiMontado = true;
+  const cont = document.getElementById('pbi-container');
+  if(POWERBI_EMBED_URL && POWERBI_EMBED_URL.trim()){
+    cont.innerHTML = '<div class="pbi-wrap"><iframe class="pbi-frame" src="'+POWERBI_EMBED_URL+'" allowfullscreen></iframe></div>';
+  } else {
+    cont.innerHTML =
+      '<div class="pbi-help">' +
+      '<h3>Conecta tu panel de Power BI</h3>' +
+      '<p style="color:var(--ink-soft);margin-bottom:14px">Para que tu panel se vea aquí, sigue estos pasos una sola vez:</p>' +
+      '<ol>' +
+      '<li>Abre tu informe en <b>Power BI Service</b> (app.powerbi.com).</li>' +
+      '<li>Menú <b>Archivo → Insertar informe → Publicar en la web (público)</b>.</li>' +
+      '<li>Pulsa <b>Crear código de inserción</b>. Power BI te dará un enlace tipo <code>https://app.powerbi.com/view?r=eyJrIjoi…</code></li>' +
+      '<li>Copia ese enlace y pégalo en el archivo <code>admin/index.html</code> de tu repositorio en la línea <code>const POWERBI_EMBED_URL = "…";</code></li>' +
+      '<li>Guarda los cambios. Vercel republica solo y este panel mostrará tu informe.</li>' +
+      '</ol>' +
+      '<p style="margin-top:14px;color:var(--ink-soft);font-size:.88rem"><b>Importante:</b> "Publicar en la web" hace el informe <i>público en internet</i> a cualquiera con el enlace. Úsalo solo con datos no confidenciales. Si necesitas embed privado con login, hace falta una licencia Power BI Pro/Premium y otra configuración (avísame y te guío).</p>' +
+      '</div>';
+  }
+}
+
+/* ============== CALCULADORA COSTES LABORALES ============== */
+const CALC_PATH = '/datos/costes-laborales.xlsm';
+let calcWB = null;
+let calcTablaCostes = null;  // {horas: {salarioBase, plusConvenio, antiguedadBase8, compSMI, ppExtras, contComunesEmp, mei, atep, desempleo, formacion, fogasa, costeTotal}}
+let calcBaseMeses = null;    // {horas: [enero, feb, ..., dic]} -> base cotización por mes
+let calcConstantes = { smi: 1424.5, trienios_base_tabla: 8 };
+const MESES_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+async function cargarCalculadora(){
+  if(calcTablaCostes) { recalcularLaborales(); return; }
+  await cargarExcelCostes(false);
+}
+
+async function cargarExcelCostes(forzar){
+  const status = document.getElementById('calc-status');
+  status.textContent = 'Cargando datos del Excel…';
+  if(typeof XLSX === 'undefined'){
+    status.textContent = 'Esperando librería Excel…';
+    for(let i=0;i<25;i++){ await new Promise(r=>setTimeout(r,200)); if(typeof XLSX !== 'undefined') break; }
+    if(typeof XLSX === 'undefined'){ status.textContent = 'No se pudo cargar la librería de Excel. Revisa la conexión.'; return; }
+  }
+  try {
+    const resp = await fetch(CALC_PATH + (forzar ? ('?t=' + Date.now()) : ''));
+    if(!resp.ok) throw new Error('No se pudo descargar el Excel (' + resp.status + ')');
+    const buf = await resp.arrayBuffer();
+    calcWB = XLSX.read(buf, {type:'array'});
+    leerTablasExcel();
+    status.textContent = 'Datos cargados desde ' + CALC_PATH;
+    recalcularLaborales();
+  } catch(e){
+    status.textContent = 'Error: ' + e.message;
+  }
+}
+
+function leerTablasExcel(){
+  // Hoja "Costes_26": columnas B..N por horas (filas 6..44, horas 39..1)
+  const sh = calcWB.Sheets['Costes_26'];
+  if(!sh) throw new Error('No se encuentra la hoja Costes_26 en el Excel');
+  calcTablaCostes = {};
+  for(let r=6; r<=44; r++){
+    const get = (col) => {
+      const cell = sh[XLSX.utils.encode_cell({r:r-1, c:col})];
+      return cell ? cell.v : null;
+    };
+    const horas = get(1);
+    if(typeof horas !== 'number') continue;
+    calcTablaCostes[horas] = {
+      salarioBase: get(2) || 0,
+      plusConvenio: get(3) || 0,
+      antiguedadBase8: get(4) || 0,   // antigüedad para 8 trienios
+      compSMI: get(5) || 0,
+      ppExtras: get(6) || 0,
+      contComunesEmp: get(7) || 0,
+      mei: get(8) || 0,
+      atep: get(9) || 0,
+      desempleo: get(10) || 0,
+      formacion: get(11) || 0,
+      fogasa: get(12) || 0,
+      costeTotal: get(13) || 0
+    };
+  }
+  // SMI (P12 = Salario Mínimo Interprofesional)
+  const smiCell = sh[XLSX.utils.encode_cell({r:11, c:15})];
+  if(smiCell && typeof smiCell.v === 'number') calcConstantes.smi = smiCell.v;
+
+  // Hoja "Base cotización por meses" — tabla "VALORES A COGER POR MESES" empieza tras fila 48
+  // Estructura observada: fila 51..89, columna B=horas, C..N=Enero..Diciembre
+  const sh2 = calcWB.Sheets['Base cotización por meses'];
+  if(!sh2) throw new Error('No se encuentra la hoja Base cotización por meses');
+  calcBaseMeses = {};
+  // Buscar la fila que dice "VALORES A COGER POR MESES"
+  let inicioValores = -1;
+  for(let r=40; r<=60; r++){
+    const c = sh2[XLSX.utils.encode_cell({r:r, c:1})];
+    if(c && typeof c.v === 'string' && c.v.indexOf('VALORES A COGER') >= 0){ inicioValores = r+2; break; }
+  }
+  if(inicioValores < 0) inicioValores = 50; // fallback
+  for(let r=inicioValores; r<inicioValores+45; r++){
+    const horas = sh2[XLSX.utils.encode_cell({r:r, c:1})];
+    if(!horas || typeof horas.v !== 'number') continue;
+    const meses = [];
+    for(let m=0; m<12; m++){
+      const c = sh2[XLSX.utils.encode_cell({r:r, c:2+m})];
+      meses.push(c ? (c.v||0) : 0);
+    }
+    calcBaseMeses[horas.v] = meses;
+  }
+}
+
+function calcularTrienios(fechaAntig, mesIdx){
+  // Años completos desde fechaAntig hasta el último día del mes de cálculo del año 2026
+  // (replicamos lo que hace el panel del Excel; fecha de cálculo = fin de mes)
+  if(!fechaAntig) return { anos: 0, trienios: 0, fechaCalc: null };
+  // último día del mes
+  const finMes = new Date(2026, mesIdx+1, 0); // mes+1 día 0 = último día del mes anterior
+  const inicio = new Date(fechaAntig);
+  let anos = finMes.getFullYear() - inicio.getFullYear();
+  // ajustar si aún no se ha cumplido el aniversario
+  const mesAniv = inicio.getMonth();
+  const diaAniv = inicio.getDate();
+  if(finMes.getMonth() < mesAniv || (finMes.getMonth() === mesAniv && finMes.getDate() < diaAniv)){
+    anos -= 1;
+  }
+  if(anos < 0) anos = 0;
+  const trienios = Math.floor(anos / 3);
+  return { anos, trienios, fechaCalc: finMes };
+}
+
+function eurFmt(n){
+  if(typeof n !== 'number' || isNaN(n)) return '— €';
+  return n.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+}
+
+function fechaEs(d){
+  if(!d) return '—';
+  return d.getDate() + ' de ' + MESES_ES[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+function recalcularLaborales(){
+  if(!calcTablaCostes){ return; }
+  const horas = parseInt(document.getElementById('calc-horas').value) || 0;
+  const fechaAntig = document.getElementById('calc-antiguedad').value;
+  const mesIdx = parseInt(document.getElementById('calc-mes').value) || 0;
+
+  const fila = calcTablaCostes[horas];
+  if(!fila){
+    document.getElementById('calc-status').textContent = 'Las horas/semana deben estar entre 1 y 39 (no hay fila ' + horas + ' en la tabla).';
+    return;
+  }
+
+  // === Fórmulas oficiales (extraídas del panel del Excel) ===
+  const t = calcularTrienios(fechaAntig, mesIdx);
+  const smi = calcConstantes.smi;
+  const smiMensualEscalado = (smi / 39) * horas;
+
+  // Antigüedad: 16,28 €/trienio escalado por horas (fórmula F31 del Excel)
+  const antiguedadReal = 16.28 * t.trienios * (horas / 39);
+
+  // P.p. extras: 3 meses de salario base + antigüedad prorrateados al año
+  // = (salarioBase + antigüedad) × 3/12 = ((SB+Antig)/360)*30*3
+  const ppExtras = (fila.salarioBase + antiguedadReal) * 0.25;
+
+  // Comp. SMI absorbible: completa hasta el SMI mensual escalado
+  const compSMI = smiMensualEscalado - (fila.salarioBase + fila.plusConvenio + antiguedadReal + ppExtras);
+
+  // Bruto mensual = suma de los 5 conceptos
+  const bruto = fila.salarioBase + fila.plusConvenio + antiguedadReal + compSMI + ppExtras;
+
+  // Base de cotización del mes: leemos directamente de la tabla del Excel
+  // (esa tabla ya considera SMI mínimo y los meses con más días laborables como julio/septiembre)
+  let baseMes = bruto;
+  if(calcBaseMeses && calcBaseMeses[horas]){
+    baseMes = calcBaseMeses[horas][mesIdx];
+  }
+
+  // Cotizaciones (los porcentajes ya están aplicados en la tabla para 8 trienios y SMI base;
+  // aquí los recalculamos exactos a partir de la base de cotización real)
+  const PCT_CC_EMP = 0.236, PCT_ATEP = 0.036, PCT_DESEMP = 0.055, PCT_FORM_EMP = 0.006, PCT_FOGASA = 0.002, PCT_MEI_EMP = 0.0075;
+  const PCT_CC_TRAB = 0.047, PCT_FORM_TRAB = 0.001, PCT_DESEMP_TRAB = 0.0155, PCT_MEI_TRAB = 0.0015;
+
+  const ccEmp = baseMes * PCT_CC_EMP;
+  const atep = baseMes * PCT_ATEP;
+  const desempEmp = baseMes * PCT_DESEMP;
+  const formEmp = baseMes * PCT_FORM_EMP;
+  const fogasa = baseMes * PCT_FOGASA;
+  const meiEmp = baseMes * PCT_MEI_EMP;
+  const totalSSEmp = ccEmp + atep + desempEmp + formEmp + fogasa + meiEmp;
+
+  const ccTrab = baseMes * PCT_CC_TRAB;
+  const formTrab = baseMes * PCT_FORM_TRAB;
+  const desempTrab = baseMes * PCT_DESEMP_TRAB;
+  const meiTrab = baseMes * PCT_MEI_TRAB;
+  const totalSSTrab = ccTrab + formTrab + desempTrab + meiTrab;
+
+  const neto = bruto - totalSSTrab;
+  const costeTotal = bruto + totalSSEmp;
+
+  // Renderizar
+  document.getElementById('calc-salario').innerHTML =
+    fila_calc('Salario base', fila.salarioBase) +
+    fila_calc('Plus convenio', fila.plusConvenio) +
+    fila_calc('Antigüedad (' + t.trienios + ' trienios)', antiguedadReal) +
+    fila_calc('Comp. SMI', fila.compSMI) +
+    fila_calc('P.p. extras', fila.ppExtras) +
+    fila_calc('<b>Bruto mensual</b>', bruto, true) +
+    fila_calc('Base cotización mes', baseMes);
+
+  document.getElementById('calc-ss').innerHTML =
+    fila_calc('Contingencias Comunes Empresa', ccEmp) +
+    fila_calc('AT y EP', atep) +
+    fila_calc('Desempleo Empresa', desempEmp) +
+    fila_calc('Formación Empresa', formEmp) +
+    fila_calc('FOGASA', fogasa) +
+    fila_calc('MEI empresa', meiEmp) +
+    fila_calc('<b>Total SS empresa</b>', totalSSEmp, true) +
+    '<tr><td colspan="2" style="background:var(--cloud);padding:6px 12px;font-family:var(--d);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft)">Cotización trabajador/a</td></tr>' +
+    fila_calc('Contingencias Comunes trabajador/a', ccTrab) +
+    fila_calc('Formación trabajador/a', formTrab) +
+    fila_calc('Desempleo trabajador/a', desempTrab) +
+    fila_calc('MEI trabajador/a', meiTrab) +
+    fila_calc('<b>Neto trabajador/a</b>', neto, true);
+
+  document.getElementById('calc-coste-total').textContent = eurFmt(costeTotal);
+  document.getElementById('calc-bruto').textContent = eurFmt(bruto);
+  document.getElementById('calc-ss-emp').textContent = eurFmt(totalSSEmp);
+  document.getElementById('calc-neto').textContent = eurFmt(neto);
+  document.getElementById('calc-info-antig').innerHTML =
+    'Fecha cálculo: <b>' + fechaEs(t.fechaCalc) + '</b><br>' +
+    'Años completos: <b>' + t.anos + '</b> · Trienios: <b>' + t.trienios + '</b>';
+}
+
+function fila_calc(label, valor, destacado){
+  return '<tr' + (destacado ? ' class="result"' : '') + '>' +
+         '<td>' + label + '</td>' +
+         '<td>' + eurFmt(valor) + '</td></tr>';
+}
+</script>
+
+<script>
+/* =========================================================================
+   CONTROL HORARIO · empleadas, clientes y horas fichadas
+   ========================================================================= */
+const API_F = "/api/fichajes";
+let fEmpleadas = [];
+let fClientes = [];
+let fRegistros = [];
+let fCargado = false;
+
+const DIAS_ES  = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const MESES_ES2 = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+async function apiF(accion, cuerpo){
+  const r = await fetch(API_F, {
+    method: "POST",
+    headers: { "Content-Type":"application/json", "x-admin-key": KEY },
+    body: JSON.stringify(Object.assign({ accion }, cuerpo || {}))
+  });
+  let j = {};
+  try { j = await r.json(); } catch(e){}
+  if(!r.ok) throw new Error(j.error || "Error en la operación");
+  return j;
+}
+
+async function abrirControlHorario(tab){
+  document.getElementById("url-fichaje").textContent = location.origin + "/horas";
+  if(!fCargado){
+    try{
+      const j = await apiF("admin-datos", {});
+      fEmpleadas = j.empleadas || [];
+      fClientes  = j.clientes || [];
+      fCargado = true;
+      rellenarFiltros();
+      if(!document.getElementById("h-desde").value) rangoRapido("mes", true);
+    }catch(e){
+      document.getElementById("h-tabla").innerHTML = '<div class="empty">No se han podido cargar los datos: ' + esc(e.message) + '</div>';
+    }
+  }
+  if(tab === "empleadas") pintarEmpleadas();
+  if(tab === "clientes")  pintarClientes();
+  if(tab === "horas")     cargarHorasAdmin();
+}
+
+function rellenarFiltros(){
+  const e = document.getElementById("h-emp");
+  const c = document.getElementById("h-cli");
+  e.innerHTML = '<option value="">Todas las empleadas</option>' +
+    fEmpleadas.map(x => '<option value="'+x.id+'">'+esc(x.nombre)+'</option>').join("");
+  c.innerHTML = '<option value="">Todos los clientes</option>' +
+    fClientes.map(x => '<option value="'+x.id+'">'+esc(x.nombre)+'</option>').join("");
+}
+
+/* ================= HORAS FICHADAS ================= */
+function isoHoy(){ return new Date().toISOString().slice(0,10); }
+
+function rangoRapido(cual, silencioso){
+  const hoy = new Date();
+  let d, h = new Date(hoy);
+  if(cual === "mes")     d = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  if(cual === "mesant"){ d = new Date(hoy.getFullYear(), hoy.getMonth()-1, 1);
+                         h = new Date(hoy.getFullYear(), hoy.getMonth(), 0); }
+  if(cual === "semana"){ const dow = (hoy.getDay()+6)%7; d = new Date(hoy); d.setDate(hoy.getDate()-dow); }
+  if(cual === "ano")     d = new Date(hoy.getFullYear(), 0, 1);
+  const fmt = x => new Date(x.getTime() - x.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  document.getElementById("h-desde").value = fmt(d);
+  document.getElementById("h-hasta").value = fmt(h);
+  if(!silencioso) cargarHorasAdmin();
+}
+
+let fPeticion = 0;
+async function cargarHorasAdmin(){
+  const cont = document.getElementById("h-tabla");
+  const mia = ++fPeticion;
+  cont.innerHTML = '<div style="padding:36px;text-align:center;color:var(--ink-soft)">Cargando…</div>';
+  try{
+    const j = await apiF("admin-fichajes", {
+      desde: document.getElementById("h-desde").value || undefined,
+      hasta: document.getElementById("h-hasta").value || undefined,
+      empId: document.getElementById("h-emp").value || undefined,
+      cliId: document.getElementById("h-cli").value || undefined
+    });
+    if(mia !== fPeticion) return;   // ha llegado tarde: manda la consulta más nueva
+    fRegistros = j.registros || [];
+    pintarHorasAdmin();
+  }catch(e){
+    if(mia !== fPeticion) return;
+    cont.innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
+  }
+}
+
+function registrosFiltrados(){
+  const modo = document.getElementById("h-dias").value;
+  if(modo === "laborables") return fRegistros.filter(r => !r.finDeSemana);
+  if(modo === "finde")      return fRegistros.filter(r => r.finDeSemana);
+  return fRegistros;
+}
+
+const anchoMovil = window.matchMedia("(max-width:760px)");
+let modoMovil = anchoMovil.matches;
+
+function pintarHorasAdmin(){
+  const lista = registrosFiltrados();
+  const kpis = document.getElementById("h-kpis");
+  const cont = document.getElementById("h-tabla");
+
+  const totalMin = lista.reduce((s,r)=> s + (r.minutos||0), 0);
+  const totalEur = lista.reduce((s,r)=> s + (r.importe||0), 0);
+  const findeMin = lista.filter(r=>r.finDeSemana).reduce((s,r)=> s + (r.minutos||0), 0);
+  const sinPrecio = lista.filter(r => !r.precioHora).length;
+
+  kpis.innerHTML =
+    kpi("Horas totales", horasDec(totalMin) + " h", true) +
+    kpi("Importe", eurFmt(totalEur)) +
+    kpi("Apuntes", String(lista.length)) +
+    kpi("Horas en fin de semana", horasDec(findeMin) + " h") +
+    kpi("Sin precio/hora", String(sinPrecio));
+
+  if(!lista.length){
+    cont.innerHTML = '<div class="empty" style="border:none">No hay horas registradas en este periodo.</div>';
+    return;
+  }
+
+  cont.innerHTML = modoMovil
+    ? tarjetasHoras(lista, totalMin, totalEur)
+    : tablaHoras(lista, totalMin, totalEur);
+}
+
+/* Pantalla ancha: tabla completa */
+function tablaHoras(lista, totalMin, totalEur){
+  const filas = lista.map(r => {
+    const abierto = !r.salida;
+    return '<tr class="' + (r.finDeSemana ? "finde" : "") + '">' +
+      '<td style="white-space:nowrap">' + fechaCorta(r.fecha) + '</td>' +
+      '<td style="text-transform:capitalize">' + esc(r.diaSemana) +
+        (r.finDeSemana ? ' <span class="pill fin">finde</span>' : '') + '</td>' +
+      '<td>' + esc(r.empNombre || "—") + '</td>' +
+      '<td>' + esc(r.cliNombre || "—") + '</td>' +
+      '<td>' + esc(r.entrada) + '</td>' +
+      '<td>' + (abierto ? '<span class="pill no">sin salida</span>' : esc(r.salida)) + '</td>' +
+      '<td class="num">' + (abierto ? "—" : horasDec(r.minutos)) + '</td>' +
+      '<td class="num"><input class="in-precio" type="number" step="0.01" min="0" inputmode="decimal" value="' +
+        (r.precioHora || "") + '" onchange="cambiarPrecio(\'' + r.id + '\', this.value)"></td>' +
+      '<td class="num">' + eurFmt(r.importe || 0) + '</td>' +
+      '<td>' + (r.validado ? '<span class="pill rev">revisado</span>' : '<span style="color:var(--ink-soft);font-size:.85rem">pendiente</span>') + '</td>' +
+      '<td style="white-space:nowrap">' +
+        '<button class="acc-mini" onclick="abrirFichaje(\'' + r.id + '\')">Editar</button>' +
+        '<button class="acc-mini" onclick="validar(\'' + r.id + '\',' + (!r.validado) + ')">' + (r.validado ? "Reabrir" : "Revisar") + '</button>' +
+        '<button class="acc-mini rojo" onclick="borrarFichaje(\'' + r.id + '\')">Borrar</button>' +
+      '</td></tr>';
+  }).join("");
+
+  return '<table class="t"><thead><tr>' +
+      '<th>Fecha</th><th>Día</th><th>Empleada</th><th>Cliente</th><th>Entrada</th><th>Salida</th>' +
+      '<th style="text-align:right">Horas</th><th style="text-align:right">Precio/h</th>' +
+      '<th style="text-align:right">Importe</th><th>Estado</th><th>Acciones</th>' +
+    '</tr></thead><tbody>' + filas + '</tbody>' +
+    '<tfoot><tr><td colspan="6">Total ' + lista.length + ' apuntes</td>' +
+      '<td class="num">' + horasDec(totalMin) + '</td><td></td>' +
+      '<td class="num">' + eurFmt(totalEur) + '</td><td colspan="2"></td></tr></tfoot></table>';
+}
+
+/* Móvil: una tarjeta por apunte, sin scroll lateral */
+function tarjetasHoras(lista, totalMin, totalEur){
+  const tarjetas = lista.map(r => {
+    const abierto = !r.salida;
+    return '<div class="reg' + (r.finDeSemana ? " finde" : "") + '">' +
+      '<div class="reg-top"><b>' + esc(r.diaSemana.slice(0,3)) + " " + fechaCorta(r.fecha) + '</b>' +
+        '<span class="h">' + (abierto ? "—" : horasDec(r.minutos) + " h") + '</span></div>' +
+      '<div class="reg-quien">' + esc(r.empNombre || "—") + '</div>' +
+      '<div class="reg-cli">' + esc(r.cliNombre || "—") + '</div>' +
+      '<div class="reg-hr">' + esc(r.entrada) + " – " +
+        (abierto ? '<span class="pill no">sin salida</span>' : esc(r.salida)) +
+        (r.finDeSemana ? ' <span class="pill fin">finde</span>' : '') +
+        (r.validado ? ' <span class="pill rev">revisado</span>' : '') + '</div>' +
+      '<div class="reg-pie">' +
+        '<label>Precio/h<input class="in-precio" type="number" step="0.01" min="0" inputmode="decimal" value="' +
+          (r.precioHora || "") + '" onchange="cambiarPrecio(\'' + r.id + '\', this.value)"></label>' +
+        '<span class="imp">' + eurFmt(r.importe || 0) + '</span>' +
+      '</div>' +
+      '<div class="reg-acc">' +
+        '<button onclick="abrirFichaje(\'' + r.id + '\')">Editar</button>' +
+        '<button onclick="validar(\'' + r.id + '\',' + (!r.validado) + ')">' + (r.validado ? "Reabrir" : "Revisar") + '</button>' +
+        '<button class="rojo" onclick="borrarFichaje(\'' + r.id + '\')">Borrar</button>' +
+      '</div></div>';
+  }).join("");
+
+  return tarjetas +
+    '<div class="resumen-movil">' +
+      '<div><div class="l">' + lista.length + ' apuntes</div><div class="v">' + horasDec(totalMin) + ' h</div></div>' +
+      '<div style="text-align:right"><div class="l">Importe</div><div class="v">' + eurFmt(totalEur) + '</div></div>' +
+    '</div>';
+}
+
+// Si se gira el móvil o se cambia el tamaño, se repinta en el formato adecuado
+anchoMovil.addEventListener("change", e => {
+  modoMovil = e.matches;
+  if(fRegistros.length && !document.getElementById("pane-horas").classList.contains("hide")) pintarHorasAdmin();
+});
+
+function kpi(l, v, destacado){
+  return '<div class="kpi' + (destacado ? " destacado" : "") + '"><div class="l">' + l + '</div><div class="v">' + v + '</div></div>';
+}
+function horasDec(min){ return (Math.round((min||0)/60*100)/100).toLocaleString("es-ES",{minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fechaCorta(f){ return f.split("-").reverse().join("/"); }
+
+async function cambiarPrecio(id, valor){
+  try{
+    const j = await apiF("fic-precio", { ids:[id], precioHora: valor });
+    const nuevo = (j.registros || [])[0];
+    if(nuevo){
+      const i = fRegistros.findIndex(r => r.id === id);
+      if(i >= 0) fRegistros[i] = nuevo;
+      pintarHorasAdmin();
+    }
+  }catch(e){ alert(e.message); }
+}
+
+async function validar(id, valor){
+  try{
+    await apiF("fic-validar", { ids:[id], validado: valor });
+    const r = fRegistros.find(x => x.id === id);
+    if(r) r.validado = valor;
+    pintarHorasAdmin();
+  }catch(e){ alert(e.message); }
+}
+
+async function borrarFichaje(id){
+  if(!confirm("¿Borrar este registro de horas? Esta acción no se puede deshacer.")) return;
+  try{
+    await apiF("fic-eliminar", { id });
+    fRegistros = fRegistros.filter(r => r.id !== id);
+    pintarHorasAdmin();
+  }catch(e){ alert(e.message); }
+}
+
+/* ================= EXPORTAR A EXCEL ================= */
+function exportarExcel(){
+  const lista = registrosFiltrados();
+  if(!lista.length){ alert("No hay horas que exportar en este periodo."); return; }
+  if(typeof XLSX === "undefined"){ alert("La librería de Excel no está disponible. Recarga la página."); return; }
+
+  const detalle = lista.slice().sort((a,b)=>
+    a.fecha === b.fecha ? (a.entrada||"").localeCompare(b.entrada||"") : a.fecha.localeCompare(b.fecha)
+  ).map(r => ({
+    "Fecha": r.fecha,
+    "Día": r.diaSemana,
+    "Fin de semana": r.finDeSemana ? "Sí" : "No",
+    "Empleada": r.empNombre || "",
+    "Cliente": r.cliNombre || "",
+    "Entrada": r.entrada || "",
+    "Salida": r.salida || "",
+    "Horas": +( (r.minutos||0)/60 ).toFixed(2),
+    "Precio/hora": r.precioHora || 0,
+    "Importe": r.importe || 0,
+    "Revisado": r.validado ? "Sí" : "No",
+    "Notas": r.notas || ""
+  }));
+
+  const agrupar = (campo, etiqueta) => {
+    const m = {};
+    lista.forEach(r => {
+      const k = r[campo] || "—";
+      m[k] = m[k] || { min:0, eur:0, turnos:0, finde:0 };
+      m[k].min += r.minutos || 0;
+      m[k].eur += r.importe || 0;
+      m[k].turnos++;
+      if(r.finDeSemana) m[k].finde += r.minutos || 0;
+    });
+    return Object.keys(m).sort((a,b)=>a.localeCompare(b,"es")).map(k => ({
+      [etiqueta]: k,
+      "Apuntes": m[k].turnos,
+      "Horas": +(m[k].min/60).toFixed(2),
+      "Horas en finde": +(m[k].finde/60).toFixed(2),
+      "Importe": +m[k].eur.toFixed(2)
+    }));
+  };
+
+  const wb = XLSX.utils.book_new();
+  const h1 = XLSX.utils.json_to_sheet(detalle);
+  h1["!cols"] = [{wch:11},{wch:11},{wch:13},{wch:22},{wch:26},{wch:9},{wch:9},{wch:8},{wch:11},{wch:11},{wch:10},{wch:34}];
+  XLSX.utils.book_append_sheet(wb, h1, "Detalle");
+
+  const h2 = XLSX.utils.json_to_sheet(agrupar("empNombre","Empleada"));
+  h2["!cols"] = [{wch:24},{wch:9},{wch:9},{wch:14},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, h2, "Por empleada");
+
+  const h3 = XLSX.utils.json_to_sheet(agrupar("cliNombre","Cliente"));
+  h3["!cols"] = [{wch:28},{wch:9},{wch:9},{wch:14},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, h3, "Por cliente");
+
+  const desde = document.getElementById("h-desde").value;
+  const hasta = document.getElementById("h-hasta").value;
+  XLSX.writeFile(wb, "horas_" + desde + "_a_" + hasta + ".xlsx");
+}
+
+/* ================= ALTA Y EDICIÓN DE FICHAJES ================= */
+function abrirModalF(html){
+  document.getElementById("modal-fichajes-caja").innerHTML = html;
+  document.getElementById("modal-fichajes").classList.remove("hide");
+}
+function cerrarModalF(){ document.getElementById("modal-fichajes").classList.add("hide"); }
+
+function abrirFichaje(id){
+  const r = id ? fRegistros.find(x => x.id === id) : null;
+  if(!fEmpleadas.length || !fClientes.length){
+    alert("Antes de añadir horas tienes que crear al menos una empleada y un cliente.");
+    return;
+  }
+  abrirModalF(
+    '<h3>' + (r ? "Editar registro" : "Añadir horas") + '</h3>' +
+    '<div class="grid2">' +
+      '<div class="fld"><label>Empleada</label><select id="fh-reg-emp">' +
+        fEmpleadas.map(e => '<option value="'+e.id+'"' + (r && r.empId===e.id ? " selected":"") + '>'+esc(e.nombre)+'</option>').join("") +
+      '</select></div>' +
+      '<div class="fld"><label>Cliente</label><select id="fh-reg-cli">' +
+        fClientes.map(c => '<option value="'+c.id+'"' + (r && r.cliId===c.id ? " selected":"") + '>'+esc(c.nombre)+'</option>').join("") +
+      '</select></div>' +
+    '</div>' +
+    '<div class="fld"><label>Día</label><input id="fh-reg-fecha" type="date" value="' + (r ? r.fecha : isoHoy()) + '"></div>' +
+    '<div class="grid2">' +
+      '<div class="fld"><label>Entrada</label><input id="fh-reg-ent" type="time" value="' + (r ? r.entrada : "") + '"></div>' +
+      '<div class="fld"><label>Salida</label><input id="fh-reg-sal" type="time" value="' + (r && r.salida ? r.salida : "") + '"></div>' +
+    '</div>' +
+    '<div class="fld"><label>Precio/hora (€)</label><input id="fh-reg-precio" type="number" step="0.01" min="0" value="' + (r ? (r.precioHora||"") : "") + '" placeholder="Se coge del cliente si lo dejas vacío"></div>' +
+    '<div class="fld"><label>Notas</label><input id="fh-reg-notas" type="text" value="' + (r ? esc(r.notas||"") : "") + '"></div>' +
+    '<div class="err" id="fh-reg-err"></div>' +
+    '<div class="botonera">' +
+      '<button class="btn btn-ghost" onclick="cerrarModalF()">Cancelar</button>' +
+      '<button class="btn btn-blue" onclick="guardarFichaje(' + (r ? "'"+r.id+"'" : "null") + ', this)">Guardar</button>' +
+    '</div>'
+  );
+}
+
+async function guardarFichaje(id, boton){
+  const err = document.getElementById("fh-reg-err");
+  err.textContent = ""; boton.disabled = true;
+  try{
+    const precio = document.getElementById("fh-reg-precio").value;
+    await apiF("fic-guardar", {
+      id: id || undefined,
+      empId: document.getElementById("fh-reg-emp").value,
+      cliId: document.getElementById("fh-reg-cli").value,
+      fecha: document.getElementById("fh-reg-fecha").value,
+      entrada: document.getElementById("fh-reg-ent").value,
+      salida: document.getElementById("fh-reg-sal").value,
+      precioHora: precio === "" ? undefined : precio,
+      notas: document.getElementById("fh-reg-notas").value
+    });
+    cerrarModalF();
+    cargarHorasAdmin();
+  }catch(e){ err.textContent = e.message; boton.disabled = false; }
+}
+
+/* ================= EMPLEADAS ================= */
+function pintarEmpleadas(){
+  const cont = document.getElementById("lista-empleadas");
+  if(!fEmpleadas.length){
+    cont.innerHTML = '<div class="empty">Todavía no hay empleadas. Crea la primera con el botón de arriba.</div>';
+    return;
+  }
+  cont.innerHTML = fEmpleadas.map(e => {
+    const nombres = (e.clientes || []).map(id => {
+      const c = fClientes.find(x => x.id === id);
+      return c ? c.nombre : null;
+    }).filter(Boolean);
+    return '<div class="ficha' + (e.activa === false ? " off" : "") + '">' +
+      '<div class="cab"><h4>' + esc(e.nombre) + '</h4>' +
+        '<span class="pill ' + (e.activa === false ? "no" : "si") + '">' + (e.activa === false ? "sin acceso" : "activa") + '</span></div>' +
+      '<div class="meta">Usuario: <b>' + esc(e.usuario) + '</b>' +
+        (e.telefono ? ' · ' + esc(e.telefono) : ' · <span style="color:var(--ink-soft)">sin teléfono</span>') +
+        (e.waVinculado ? ' <span class="pill si">WhatsApp activo</span>'
+                       : (e.telefono ? ' <span class="pill fin">WhatsApp pendiente</span>' : '')) + '</div>' +
+      '<div class="asig"><b>Clientes asignados</b>' +
+        (nombres.length ? esc(nombres.join(", ")) : "Ninguno todavía") + '</div>' +
+      '<div class="botones">' +
+        '<button class="mini" onclick="abrirAsignar(\'' + e.id + '\')">Asignar clientes</button>' +
+        '<button class="mini" onclick="abrirEmpleada(\'' + e.id + '\')">Editar</button>' +
+        '<button class="mini" onclick="verHorasDe(\'' + e.id + '\')">Ver sus horas</button>' +
+        (e.waVinculado ? '<button class="mini" onclick="desvincularWA(\'' + e.id + '\')">Desvincular WhatsApp</button>' : '') +
+        '<button class="mini red" onclick="borrarEmpleada(\'' + e.id + '\')">Borrar</button>' +
+      '</div></div>';
+  }).join("");
+}
+
+function abrirEmpleada(id){
+  const e = id ? fEmpleadas.find(x => x.id === id) : null;
+  abrirModalF(
+    '<h3>' + (e ? "Editar empleada" : "Nueva empleada") + '</h3>' +
+    '<div class="fld"><label>Nombre y apellidos</label><input id="fh-emp-nombre" type="text" value="' + (e ? esc(e.nombre) : "") + '" placeholder="María García"></div>' +
+    '<div class="grid2">' +
+      '<div class="fld"><label>Usuario para entrar</label><input id="fh-emp-usuario" type="text" autocapitalize="none" value="' + (e ? esc(e.usuario) : "") + '" placeholder="maria"></div>' +
+      '<div class="fld"><label>Teléfono (para WhatsApp)</label><input id="fh-emp-tel" type="tel" inputmode="tel" value="' + (e ? esc(e.telefono||"") : "") + '" placeholder="600 11 22 33"></div>' +
+    '</div>' +
+    '<div class="fld"><label>' + (e ? "Nueva contraseña (déjalo vacío para no cambiarla)" : "Contraseña") + '</label>' +
+      '<input id="fh-emp-pass" type="text" placeholder="Mínimo 6 caracteres"></div>' +
+    '<div class="fld"><label><input id="fh-emp-activa" type="checkbox" ' + (!e || e.activa !== false ? "checked" : "") + ' style="width:auto;margin-right:8px">Puede entrar en el panel</label></div>' +
+    (e ? "" : '<div class="nota-info" style="margin:14px 0 0">Apunta la contraseña: por seguridad no se puede volver a consultar, solo cambiar por otra nueva.</div>') +
+    '<div class="err" id="fh-emp-err"></div>' +
+    '<div class="botonera">' +
+      '<button class="btn btn-ghost" onclick="cerrarModalF()">Cancelar</button>' +
+      '<button class="btn btn-blue" onclick="guardarEmpleada(' + (e ? "'"+e.id+"'" : "null") + ', this)">Guardar</button>' +
+    '</div>'
+  );
+}
+
+async function guardarEmpleada(id, boton){
+  const err = document.getElementById("fh-emp-err");
+  err.textContent = ""; boton.disabled = true;
+  try{
+    const pass = document.getElementById("fh-emp-pass").value;
+    const j = await apiF("emp-guardar", {
+      id: id || undefined,
+      nombre: document.getElementById("fh-emp-nombre").value,
+      usuario: document.getElementById("fh-emp-usuario").value,
+      telefono: document.getElementById("fh-emp-tel").value,
+      activa: document.getElementById("fh-emp-activa").checked,
+      pass: pass || undefined
+    });
+    const i = fEmpleadas.findIndex(x => x.id === j.empleada.id);
+    if(i >= 0) fEmpleadas[i] = j.empleada; else fEmpleadas.push(j.empleada);
+    fEmpleadas.sort((a,b)=> (a.nombre||"").localeCompare(b.nombre||"", "es"));
+    cerrarModalF();
+    rellenarFiltros();
+    pintarEmpleadas();
+  }catch(e){ err.textContent = e.message; boton.disabled = false; }
+}
+
+async function desvincularWA(id){
+  if(!confirm("La próxima vez que escriba por WhatsApp le pediré la contraseña otra vez.\n\n¿Continuar?")) return;
+  try{
+    await apiF("wa-desvincular", { id });
+    const e = fEmpleadas.find(x => x.id === id);
+    if(e) e.waVinculado = false;
+    pintarEmpleadas();
+  }catch(e){ alert(e.message); }
+}
+
+async function borrarEmpleada(id){
+  const e = fEmpleadas.find(x => x.id === id);
+  if(!confirm("¿Borrar el acceso de " + (e ? e.nombre : "esta empleada") + "?\n\nSus horas ya registradas se conservan en el historial.")) return;
+  try{
+    await apiF("emp-eliminar", { id });
+    fEmpleadas = fEmpleadas.filter(x => x.id !== id);
+    rellenarFiltros();
+    pintarEmpleadas();
+  }catch(e){ alert(e.message); }
+}
+
+function abrirAsignar(id){
+  const e = fEmpleadas.find(x => x.id === id);
+  if(!e) return;
+  if(!fClientes.length){ alert("Primero crea algún cliente en el apartado Clientes."); return; }
+  abrirModalF(
+    '<h3>Clientes de ' + esc(e.nombre) + '</h3>' +
+    '<p style="color:var(--ink-soft);font-size:.92rem;margin-bottom:14px">Marca los sitios donde trabaja. Solo esos le aparecerán al fichar.</p>' +
+    '<div class="checks">' +
+      fClientes.map(c => '<label><input type="checkbox" value="'+c.id+'"' +
+        ((e.clientes||[]).includes(c.id) ? " checked" : "") + '>' + esc(c.nombre) +
+        (c.activo === false ? ' <span class="pill no">inactivo</span>' : '') + '</label>').join("") +
+    '</div>' +
+    '<div class="err" id="fh-asig-err"></div>' +
+    '<div class="botonera">' +
+      '<button class="btn btn-ghost" onclick="cerrarModalF()">Cancelar</button>' +
+      '<button class="btn btn-blue" onclick="guardarAsignar(\'' + id + '\', this)">Guardar</button>' +
+    '</div>'
+  );
+}
+
+async function guardarAsignar(id, boton){
+  boton.disabled = true;
+  const marcados = [...document.querySelectorAll(".checks input:checked")].map(i => i.value);
+  try{
+    await apiF("asignar", { empId: id, clientes: marcados });
+    const e = fEmpleadas.find(x => x.id === id);
+    if(e) e.clientes = marcados;
+    cerrarModalF();
+    pintarEmpleadas();
+  }catch(e){ document.getElementById("fh-asig-err").textContent = e.message; boton.disabled = false; }
+}
+
+function verHorasDe(id){
+  verTab("horas");
+  document.getElementById("h-emp").value = id;
+  rangoRapido("mes", true);
+  cargarHorasAdmin();
+}
+
+/* ================= CLIENTES ================= */
+function pintarClientes(){
+  const cont = document.getElementById("lista-clientes");
+  if(!fClientes.length){
+    cont.innerHTML = '<div class="empty">Todavía no hay clientes. Crea el primero con el botón de arriba.</div>';
+    return;
+  }
+  cont.innerHTML = fClientes.map(c => {
+    const quienes = fEmpleadas.filter(e => (e.clientes||[]).includes(c.id)).map(e => e.nombre);
+    return '<div class="ficha' + (c.activo === false ? " off" : "") + '">' +
+      '<div class="cab"><h4>' + esc(c.nombre) + '</h4>' +
+        '<span class="pill ' + (c.activo === false ? "no" : "si") + '">' + (c.activo === false ? "inactivo" : "activo") + '</span></div>' +
+      '<div class="meta">' + (c.direccion ? esc(c.direccion) + " · " : "") +
+        '<b>' + (c.precioHora ? eurFmt(c.precioHora) + "/h" : "sin precio") + '</b></div>' +
+      '<div class="asig"><b>Empleadas asignadas</b>' + (quienes.length ? esc(quienes.join(", ")) : "Ninguna todavía") + '</div>' +
+      '<div class="botones">' +
+        '<button class="mini" onclick="abrirCliente(\'' + c.id + '\')">Editar</button>' +
+        '<button class="mini" onclick="verHorasCliente(\'' + c.id + '\')">Ver sus horas</button>' +
+        '<button class="mini red" onclick="borrarCliente(\'' + c.id + '\')">Borrar</button>' +
+      '</div></div>';
+  }).join("");
+}
+
+function abrirCliente(id){
+  const c = id ? fClientes.find(x => x.id === id) : null;
+  abrirModalF(
+    '<h3>' + (c ? "Editar cliente" : "Nuevo cliente") + '</h3>' +
+    '<div class="fld"><label>Nombre</label><input id="fh-cli-nombre" type="text" value="' + (c ? esc(c.nombre) : "") + '" placeholder="Comunidad C/ Enmedio 22"></div>' +
+    '<div class="fld"><label>Dirección (opcional)</label><input id="fh-cli-dir" type="text" value="' + (c ? esc(c.direccion||"") : "") + '"></div>' +
+    '<div class="fld"><label>Precio por hora que se factura (€)</label>' +
+      '<input id="fh-cli-precio" type="number" step="0.01" min="0" value="' + (c ? (c.precioHora||"") : "") + '" placeholder="15"></div>' +
+    '<div class="fld"><label>Notas internas (opcional)</label><input id="fh-cli-notas" type="text" value="' + (c ? esc(c.notas||"") : "") + '"></div>' +
+    '<div class="fld"><label><input id="fh-cli-activo" type="checkbox" ' + (!c || c.activo !== false ? "checked" : "") + ' style="width:auto;margin-right:8px">Cliente activo</label></div>' +
+    '<div class="err" id="fh-cli-err"></div>' +
+    '<div class="botonera">' +
+      '<button class="btn btn-ghost" onclick="cerrarModalF()">Cancelar</button>' +
+      '<button class="btn btn-blue" onclick="guardarCliente(' + (c ? "'"+c.id+"'" : "null") + ', this)">Guardar</button>' +
+    '</div>'
+  );
+}
+
+async function guardarCliente(id, boton){
+  const err = document.getElementById("fh-cli-err");
+  err.textContent = ""; boton.disabled = true;
+  try{
+    const j = await apiF("cli-guardar", {
+      id: id || undefined,
+      nombre: document.getElementById("fh-cli-nombre").value,
+      direccion: document.getElementById("fh-cli-dir").value,
+      precioHora: document.getElementById("fh-cli-precio").value,
+      notas: document.getElementById("fh-cli-notas").value,
+      activo: document.getElementById("fh-cli-activo").checked
+    });
+    const i = fClientes.findIndex(x => x.id === j.cliente.id);
+    if(i >= 0) fClientes[i] = j.cliente; else fClientes.push(j.cliente);
+    fClientes.sort((a,b)=> (a.nombre||"").localeCompare(b.nombre||"", "es"));
+    cerrarModalF();
+    rellenarFiltros();
+    pintarClientes();
+  }catch(e){ err.textContent = e.message; boton.disabled = false; }
+}
+
+async function borrarCliente(id){
+  const c = fClientes.find(x => x.id === id);
+  if(!confirm("¿Borrar el cliente " + (c ? c.nombre : "") + "?\n\nLas horas ya registradas se conservan en el historial.")) return;
+  try{
+    await apiF("cli-eliminar", { id });
+    fClientes = fClientes.filter(x => x.id !== id);
+    fEmpleadas.forEach(e => { e.clientes = (e.clientes||[]).filter(x => x !== id); });
+    rellenarFiltros();
+    pintarClientes();
+  }catch(e){ alert(e.message); }
+}
+
+function verHorasCliente(id){
+  verTab("horas");
+  document.getElementById("h-cli").value = id;
+  rangoRapido("mes", true);
+  cargarHorasAdmin();
+}
+</script>
+</body>
+</html>
