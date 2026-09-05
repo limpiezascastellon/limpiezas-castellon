@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0E5AA7">
+<title>Mis horas · Limpiezas Castellón</title>
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C2A3E;--ink-soft:#3E5A6E;--brand:#0E5AA7;--brand-deep:#0A3A6E;
+  --fresh:#16C2B0;--fresh-deep:#0E9C8E;--cloud:#F3F8FC;--mist:#E9F3FA;--line:#DCE8F1;
+  --rojo:#C0392B;--ambar:#8A5A00;--finde-bg:#FFFDF3;--finde-line:#F0DCA8;
+  --apagado:#9BB1C1;
+  --d:Bricolage Grotesque,sans-serif;--b:Hanken Grotesk,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--b);background:var(--cloud);color:var(--ink);line-height:1.55;
+     padding-bottom:env(safe-area-inset-bottom);-webkit-font-smoothing:antialiased;
+     -webkit-text-size-adjust:100%;overflow-x:hidden}
+body.bloqueado{overflow:hidden}
+h1,h2,h3{font-family:var(--d);line-height:1.2}
+button{font-family:var(--d);cursor:pointer;border:none}
+.wrap{max-width:600px;margin:0 auto;
+  padding:0 max(16px,env(safe-area-inset-left)) 0 max(16px,env(safe-area-inset-right))}
+.hide{display:none !important}
+
+/* ---------- ENTRAR ---------- */
+.login{max-width:400px;margin:44px auto;padding:0 16px}
+.login-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px 26px;text-align:center}
+.login-card img{max-width:170px;margin:0 auto 20px;display:block}
+.login-card h1{font-size:1.35rem;margin-bottom:6px}
+.login-card p{color:var(--ink-soft);font-size:.94rem;margin-bottom:22px}
+.campo{text-align:left;margin-bottom:14px}
+.campo label{font-family:var(--d);font-weight:600;font-size:.83rem;display:block;margin-bottom:5px}
+.campo input,.campo select{width:100%;padding:14px 15px;border:1.5px solid var(--line);border-radius:12px;
+  font-family:var(--b);font-size:16px;background:#fff;color:var(--ink);appearance:none;-webkit-appearance:none}
+.campo input[type=time]{min-height:52px}
+.campo input:focus,.campo select:focus{outline:none;border-color:var(--fresh)}
+.btn{background:var(--fresh);color:#04231f;font-weight:700;padding:15px 24px;border-radius:12px;font-size:1.02rem;width:100%}
+.btn:active{transform:scale(.99)}
+.btn:disabled{opacity:.5}
+.btn-linea{background:#fff;border:1.5px solid var(--line);color:var(--ink);font-weight:600}
+.btn-rojo{background:#fff;border:1.5px solid #E8BDB7;color:var(--rojo);font-weight:600}
+.aviso{min-height:20px;font-size:.9rem;color:var(--rojo);margin-top:10px}
+
+/* ---------- CABECERA ---------- */
+.top{background:var(--brand);color:#fff;padding:16px 0 20px;position:sticky;top:0;z-index:20}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top .quien{font-family:var(--d);font-weight:700;font-size:1.08rem;min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.top .quien span{display:block;font-family:var(--b);font-weight:400;font-size:.83rem;opacity:.85}
+.salir{background:rgba(255,255,255,.15);color:#fff;font-size:.84rem;font-weight:600;padding:11px 15px;
+  border-radius:10px;min-height:44px;flex-shrink:0}
+.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:5px;margin:-12px 0 18px}
+.tab{flex:1;padding:13px 8px;border-radius:10px;background:none;color:var(--ink-soft);font-weight:600;
+  font-size:.95rem;min-height:46px}
+.tab.on{background:var(--brand);color:#fff}
+
+/* ---------- ELEGIR CLIENTE ---------- */
+.pregunta{font-family:var(--d);font-weight:700;font-size:1.15rem;margin-bottom:4px}
+.pregunta-sub{color:var(--ink-soft);font-size:.92rem;margin-bottom:16px}
+.cli-card{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;text-align:left;
+  background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:18px;margin-bottom:10px;
+  color:var(--ink);min-height:64px}
+.cli-card:active{border-color:var(--fresh);background:var(--mist)}
+.cli-card b{font-family:var(--d);font-size:1.05rem;display:block}
+.cli-card small{color:var(--ink-soft);font-size:.85rem;font-family:var(--b)}
+.cli-card .fl{color:var(--brand);font-size:1.3rem;font-weight:700;flex-shrink:0}
+
+/* ---------- BARRA DE CLIENTE + MES ---------- */
+.barra-cli{display:flex;align-items:center;gap:10px;background:var(--brand-deep);color:#fff;
+  border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.barra-cli .txt{flex:1;min-width:0}
+.barra-cli .txt small{display:block;font-size:.74rem;opacity:.8;text-transform:uppercase;letter-spacing:.04em}
+.barra-cli .txt b{font-family:var(--d);font-size:1.02rem;display:block;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.barra-cli button{background:rgba(255,255,255,.18);color:#fff;font-size:.82rem;font-weight:600;
+  padding:10px 13px;border-radius:9px;min-height:44px;flex-shrink:0}
+.mesnav{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);
+  border-radius:14px;padding:8px;margin-bottom:14px}
+.mesnav .flecha{width:44px;height:44px;flex-shrink:0;border-radius:11px;background:var(--mist);color:var(--brand);
+  font-size:1.2rem;font-weight:700;display:grid;place-items:center}
+.mesnav .flecha:disabled{opacity:.28}
+.mesnav .centro{flex:1;text-align:center;min-width:0}
+.mesnav .centro b{font-family:var(--d);font-size:clamp(.95rem,4.2vw,1.08rem);display:block;
+  line-height:1.25;text-transform:capitalize}
+.mesnav .centro span{font-size:.8rem;color:var(--ink-soft)}
+
+/* ---------- LA HOJA ---------- */
+.hoja{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.hoja-cab{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--mist);
+  font-family:var(--d);font-weight:700;font-size:.78rem;color:var(--brand-deep);
+  text-transform:uppercase;letter-spacing:.045em;border-bottom:1px solid var(--line)}
+.hoja-cab .c-dia{width:52px;flex-shrink:0}
+.hoja-cab .c-hor{flex:1}
+.hoja-cab .c-tot{width:70px;text-align:right;flex-shrink:0}
+
+.fila{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;
+  color:inherit;font-family:var(--b);padding:0 14px;border-bottom:1px solid var(--mist);
+  min-height:48px}
+.fila:last-child{border-bottom:none}
+.fila:active:not(:disabled){background:var(--mist)}
+.fila.finde{background:var(--finde-bg)}
+.fila.finde:active:not(:disabled){background:#FBF3DC}
+.fila:disabled{opacity:.45;cursor:default}
+.fila.hoy{box-shadow:inset 3px 0 0 var(--fresh)}
+
+.fila .c-dia{width:52px;flex-shrink:0;display:flex;align-items:baseline;gap:5px;padding:11px 0}
+.fila .c-dia .n{font-family:var(--d);font-weight:700;font-size:1.02rem}
+.fila .c-dia .s{font-size:.74rem;color:var(--ink-soft);text-transform:uppercase}
+.fila.finde .c-dia .s{color:var(--ambar);font-weight:600}
+.fila .c-hor{flex:1;min-width:0;padding:11px 0}
+.fila .c-hor .rango{font-family:var(--d);font-weight:600;font-size:.95rem;
+  font-variant-numeric:tabular-nums;display:block}
+.fila .c-hor .nota{font-size:.78rem;color:var(--ink-soft);font-style:italic;display:block;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fila .c-hor .vacio{color:var(--apagado);font-size:.92rem}
+.fila .c-tot{width:70px;text-align:right;flex-shrink:0;font-family:var(--d);font-weight:700;
+  color:var(--brand);font-size:.95rem;white-space:nowrap;padding:11px 0}
+.fila .c-tot .sin{color:var(--apagado);font-weight:600}
+.fila .candado{font-size:.72rem;color:var(--ink-soft)}
+
+/* varios tramos en un mismo día */
+.tramo{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;
+  color:inherit;font-family:var(--b);padding:0 14px 0 76px;border-bottom:1px solid var(--mist);
+  min-height:44px}
+.tramo:active{background:var(--mist)}
+.tramo .c-hor{flex:1;min-width:0;padding:9px 0}
+.tramo .c-tot{width:70px;text-align:right;flex-shrink:0;font-family:var(--d);font-weight:700;
+  color:var(--brand);font-size:.92rem;padding:9px 0}
+
+.hoja-total{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:16px 14px;background:linear-gradient(150deg,var(--brand-deep),var(--brand));color:#fff}
+.hoja-total .lab{font-family:var(--d);font-weight:700;font-size:.82rem;text-transform:uppercase;
+  letter-spacing:.05em}
+.hoja-total .val{font-family:var(--d);font-weight:800;font-size:clamp(1.3rem,6vw,1.7rem);
+  white-space:nowrap}
+
+/* ---------- RESUMEN ---------- */
+.total{background:linear-gradient(150deg,var(--brand-deep),var(--brand));color:#fff;border-radius:20px;
+  padding:24px 22px;margin-bottom:16px;text-align:center}
+.total .lab{font-size:.85rem;opacity:.85;font-weight:500}
+.total .big{font-family:var(--d);font-weight:800;font-size:clamp(1.9rem,10vw,2.7rem);line-height:1.1;
+  margin:2px 0;overflow-wrap:break-word}
+.porcli{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px;
+  border-top:1px solid rgba(255,255,255,.22);padding-top:15px}
+.porcli div{background:rgba(255,255,255,.14);border-radius:11px;padding:8px 13px;font-size:.83rem;text-align:left}
+.porcli b{font-family:var(--d);display:block;font-size:1rem;margin-top:1px}
+.tabla{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.tabla .f{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;
+  border-bottom:1px solid var(--mist);font-size:.94rem}
+.tabla .f:last-child{border-bottom:none}
+.tabla .f.finde{background:var(--finde-bg)}
+.tabla .f b{font-family:var(--d);font-weight:700}
+.tabla .f .d{text-transform:capitalize}
+.nada{text-align:center;color:var(--ink-soft);padding:40px 20px;background:#fff;
+  border:1px dashed var(--line);border-radius:16px}
+.pie{text-align:center;color:var(--ink-soft);font-size:.83rem;padding:20px 16px 34px;line-height:1.55}
+.enlace{background:none;color:var(--brand);font-weight:600;font-size:.88rem;text-decoration:underline;padding:6px}
+
+/* ---------- AVISO FLOTANTE ---------- */
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(14px);
+  bottom:calc(20px + env(safe-area-inset-bottom));z-index:90;max-width:min(440px,calc(100% - 32px));
+  background:var(--ink);color:#fff;padding:14px 18px;border-radius:13px;font-size:.92rem;
+  text-align:center;box-shadow:0 8px 26px rgba(12,42,62,.28);opacity:0;transition:opacity .2s,transform .2s;
+  pointer-events:none}
+.toast.ver{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- VENTANA ---------- */
+.modal{position:fixed;inset:0;background:rgba(12,42,62,.55);display:flex;align-items:flex-end;
+  justify-content:center;z-index:60;overscroll-behavior:contain}
+.modal.hide{display:none !important}
+.modal-caja{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:600px;
+  padding:24px 20px calc(30px + env(safe-area-inset-bottom));
+  max-height:88vh;max-height:88dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain}
+.modal-caja h3{font-size:1.18rem;margin-bottom:2px;text-transform:capitalize}
+.modal-caja .sub{color:var(--ink-soft);font-size:.9rem;margin-bottom:18px}
+.fila2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calculo{background:var(--mist);border-radius:12px;padding:13px 16px;text-align:center;font-family:var(--d);
+  font-weight:700;color:var(--brand-deep);margin-bottom:16px}
+.botonera{display:flex;gap:10px;margin-top:6px}
+.botonera .btn{flex:1}
+@media(min-width:640px){.modal{align-items:center}.modal-caja{border-radius:22px}}
+@media(max-width:360px){
+  .wrap{padding:0 12px}
+  .fila,.tramo,.hoja-cab,.hoja-total{padding-left:11px;padding-right:11px}
+  .tramo{padding-left:70px}
+  .fila .c-dia,.hoja-cab .c-dia{width:46px}
+  .fila .c-tot,.hoja-cab .c-tot{width:62px}
+  .total{padding:20px 16px}
+  .fila2{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+
+<!-- ================= ENTRAR ================= -->
+<div id="login" class="login">
+  <div class="login-card">
+    <img src="/img/logo-mini.png" alt="Limpiezas Castellón">
+    <h1>Mi parte de horas</h1>
+    <p>Entra con el usuario y la contraseña que te ha dado la oficina.</p>
+    <div class="campo">
+      <label for="usuario">Usuario</label>
+      <input id="usuario" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="maria">
+    </div>
+    <div class="campo">
+      <label for="clave">Contraseña</label>
+      <input id="clave" type="password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <button class="btn" id="btn-entrar" onclick="entrar()">Entrar</button>
+    <div class="aviso" id="login-aviso"></div>
+  </div>
+</div>
+
+<!-- ================= PANEL ================= -->
+<div id="app" class="hide">
+  <div class="top">
+    <div class="wrap">
+      <div class="quien" id="quien">—<span id="quien-sub"></span></div>
+      <button class="salir" onclick="salir()">Salir</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab on" id="tab-hoja" onclick="verPestana('hoja')">Apuntar horas</button>
+      <button class="tab" id="tab-resumen" onclick="verPestana('resumen')">Resumen del mes</button>
+    </div>
+
+    <!-- ---------- APUNTAR ---------- -->
+    <div id="pane-hoja">
+
+      <!-- paso 1: elegir cliente -->
+      <div id="paso-cliente">
+        <p class="pregunta">¿Dónde has trabajado?</p>
+        <p class="pregunta-sub">Elige el cliente y te sale la hoja del mes entera.</p>
+        <div id="lista-clientes"></div>
+      </div>
+
+      <!-- paso 2: la hoja del mes -->
+      <div id="paso-hoja" class="hide">
+        <div class="barra-cli">
+          <div class="txt">
+            <small>Instalación</small>
+            <b id="cli-nombre">—</b>
+          </div>
+          <button id="btn-cambiar-cli" onclick="volverAClientes()">Cambiar</button>
+        </div>
+
+        <div class="mesnav">
+          <button class="flecha" id="mes-atras" onclick="moverMes(-1)" aria-label="Mes anterior">‹</button>
+          <div class="centro"><b id="mes-titulo">—</b><span id="mes-sub"></span></div>
+          <button class="flecha" id="mes-alante" onclick="moverMes(1)" aria-label="Mes siguiente">›</button>
+        </div>
+
+        <div id="hoja"></div>
+        <p class="pie">Toca cualquier día para poner o corregir las horas.<br>
+          Puedes rellenarlo cuando quieras: cada día, al acabar la semana o a fin de mes.</p>
+      </div>
+    </div>
+
+    <!-- ---------- RESUMEN ---------- -->
+    <div id="pane-resumen" class="hide">
+      <div class="campo">
+        <label for="mes-resumen">Mes</label>
+        <select id="mes-resumen" onchange="pintarResumen()"></select>
+      </div>
+      <div id="resumen-total"></div>
+      <div id="resumen-detalle"></div>
+      <p class="pie">Aquí tienes tus horas de los últimos tres meses, de todos los clientes juntos.<br>
+        Los meses anteriores los conserva la oficina.</p>
+    </div>
+
+    <p class="pie"><button class="enlace" onclick="abrirClave()">Cambiar mi contraseña</button></p>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="modal" class="modal hide" onclick="if(event.target===this)cerrarModal()">
+  <div class="modal-caja" id="modal-caja"></div>
+</div>
+
+<script>
+/* =========================================================================
+   ESTADO
+   ========================================================================= */
+var API = "/api/fichajes";
+var token = leerGuardado("lc_emp_token");
+var datos = { empleada:null, clientes:[], limite:"", hoy:null };
+var registros = [];
+var cliActivo = "";      // cliente elegido en el paso 1
+var mesVisible = "";     // "AAAA-MM" de la hoja que se está viendo
+
+var DIAS  = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+var DIAS3 = ["dom","lun","mar","mié","jue","vie","sáb"];
+var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+function leerGuardado(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
+function guardar(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function borrarGuardado(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+/* =========================================================================
+   FECHAS  (formato AAAA-MM-DD, calculadas a mediodía UTC para que ningún
+   cambio de hora las desplace de día)
+   ========================================================================= */
+function aDate(f){ return new Date(f + "T12:00:00Z"); }
+function aTexto(d){ return d.toISOString().slice(0,10); }
+function diaSemana(f){ return aDate(f).getUTCDay(); }
+function esFinde(f){ var s = diaSemana(f); return s === 0 || s === 6; }
+function nombreDia(f){ return DIAS[diaSemana(f)]; }
+function nombreDia3(f){ return DIAS3[diaSemana(f)]; }
+function hoyFecha(){ return (datos.hoy && datos.hoy.fecha) || new Date().toISOString().slice(0,10); }
+function mesDe(f){ return f.slice(0,7); }
+function anyoDe(m){ return parseInt(m.slice(0,4),10); }
+function numMes(m){ return parseInt(m.slice(5,7),10); }
+function tituloMes(m){ return MESES[numMes(m)-1] + " " + anyoDe(m); }
+function diasDelMes(m){ return new Date(Date.UTC(anyoDe(m), numMes(m), 0)).getUTCDate(); }
+function fechaDe(m, dia){ return m + "-" + String(dia).padStart(2,"0"); }
+/* mueve un mes sin desbordes: siempre se parte del día 1 */
+function sumarMes(m, n){
+  var d = new Date(m + "-01T12:00:00Z");
+  d.setUTCMonth(d.getUTCMonth() + n);
+  return d.toISOString().slice(0,7);
+}
+function fechaLarga(f){
+  return nombreDia(f) + " " + aDate(f).getUTCDate() + " de " + MESES[aDate(f).getUTCMonth()];
+}
+
+/* =========================================================================
+   SERVIDOR
+   ========================================================================= */
+async function llamar(accion, cuerpo){
+  var r = await fetch(API, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "x-emp-token": token },
+    body: JSON.stringify(Object.assign({ accion: accion }, cuerpo||{}))
+  });
+  var j = {};
+  try { j = await r.json(); } catch(e){}
+  if(r.status === 401 && accion !== "login"){ salir(true); throw new Error(j.error||"Sesión caducada"); }
+  if(!r.ok) throw new Error(j.error || "No se ha podido completar la operación");
+  return j;
+}
+
+async function entrar(){
+  var u = document.getElementById("usuario").value.trim();
+  var p = document.getElementById("clave").value;
+  var aviso = document.getElementById("login-aviso");
+  var boton = document.getElementById("btn-entrar");
+  if(!u || !p){ aviso.textContent = "Escribe tu usuario y tu contraseña."; return; }
+  aviso.textContent = "Entrando…";
+  boton.disabled = true;
+  try{
+    var j = await llamar("login", { usuario:u, pass:p });
+    token = j.token; guardar("lc_emp_token", token);
+    aplicarDatos(j);
+    document.getElementById("login").classList.add("hide");
+    document.getElementById("app").classList.remove("hide");
+    await cargarHoras();
+  }catch(e){ aviso.textContent = e.message; }
+  finally{ boton.disabled = false; }
+}
+
+function salir(silencioso){
+  borrarGuardado("lc_emp_token");
+  borrarGuardado("lc_emp_cliente");
+  token = ""; registros = []; cliActivo = "";
+  document.getElementById("app").classList.add("hide");
+  document.getElementById("login").classList.remove("hide");
+  document.getElementById("clave").value = "";
+  document.getElementById("login-aviso").textContent = silencioso ? "Tu sesión ha caducado. Entra otra vez." : "";
+  cerrarModal();
+}
+
+function aplicarDatos(j){
+  datos.empleada = j.empleada || datos.empleada;
+  datos.clientes = j.clientes || [];
+  datos.limite   = j.limite || datos.limite;
+  datos.hoy      = j.hoy || datos.hoy;
+  if(datos.empleada){
+    document.getElementById("quien").childNodes[0].nodeValue = datos.empleada.nombre;
+    document.getElementById("quien-sub").textContent = "Parte de horas";
+  }
+}
+
+/* Solo vuelve a pedir los registros. Se usa después de guardar o borrar:
+   repinta la hoja sin remontar la pantalla ni mover el scroll de sitio. */
+async function refrescarRegistros(){
+  try{
+    // Se traen de una vez los tres meses visibles y luego se filtra por
+    // cliente y por mes aquí, sin volver a molestar al servidor.
+    var j = await llamar("mios", { desde: datos.limite, hasta: hoyFecha() });
+    registros = j.registros || [];
+    if(j.limite) datos.limite = j.limite;
+    if(j.hoy) datos.hoy = j.hoy;
+  }catch(e){ avisoBreve(e.message); }
+}
+
+async function cargarHoras(){
+  await refrescarRegistros();
+
+  if(!mesVisible) mesVisible = mesDe(hoyFecha());
+  prepararMesesResumen();
+  pintarClientes();
+
+  // Si solo tiene un cliente, no tiene sentido preguntarle: se entra directo.
+  var guardado = leerGuardado("lc_emp_cliente");
+  if(datos.clientes.length === 1) elegirCliente(datos.clientes[0].id);
+  else if(guardado && datos.clientes.some(function(c){ return c.id === guardado; })) elegirCliente(guardado);
+  else volverAClientes();
+
+  pintarResumen();
+}
+
+/* =========================================================================
+   PESTAÑAS
+   ========================================================================= */
+function verPestana(cual){
+  var esHoja = cual === "hoja";
+  document.getElementById("pane-hoja").classList.toggle("hide", !esHoja);
+  document.getElementById("pane-resumen").classList.toggle("hide", esHoja);
+  document.getElementById("tab-hoja").classList.toggle("on", esHoja);
+  document.getElementById("tab-resumen").classList.toggle("on", !esHoja);
+  window.scrollTo(0,0);
+}
+
+/* =========================================================================
+   PASO 1 · ELEGIR CLIENTE
+   ========================================================================= */
+function pintarClientes(){
+  var c = document.getElementById("lista-clientes");
+  if(!datos.clientes.length){
+    c.innerHTML = '<div class="nada">Todavía no tienes clientes asignados.<br>Habla con la oficina.</div>';
+    return;
+  }
+  c.innerHTML = datos.clientes.map(function(cl){
+    return '<button class="cli-card" onclick="elegirCliente(\'' + esc(cl.id) + '\')">' +
+             '<span><b>' + esc(cl.nombre) + '</b>' +
+             (cl.direccion ? '<small>' + esc(cl.direccion) + '</small>' : '') + '</span>' +
+             '<span class="fl">›</span>' +
+           '</button>';
+  }).join("");
+}
+
+function elegirCliente(id){
+  cliActivo = id;
+  guardar("lc_emp_cliente", id);
+  var cl = datos.clientes.filter(function(c){ return c.id === id; })[0];
+  document.getElementById("cli-nombre").textContent = cl ? cl.nombre : "—";
+  // Si solo tiene un cliente no hay nada que cambiar: se esconde el botón
+  document.getElementById("btn-cambiar-cli").classList.toggle("hide", datos.clientes.length < 2);
+  document.getElementById("paso-cliente").classList.add("hide");
+  document.getElementById("paso-hoja").classList.remove("hide");
+  pintarHoja();
+  window.scrollTo(0,0);
+}
+
+function volverAClientes(){
+  document.getElementById("paso-hoja").classList.add("hide");
+  document.getElementById("paso-cliente").classList.remove("hide");
+  window.scrollTo(0,0);
+}
+
+/* =========================================================================
+   PASO 2 · LA HOJA DEL MES
+   ========================================================================= */
+function mesMin(){ return mesDe(datos.limite || hoyFecha()); }
+function mesMax(){ return mesDe(hoyFecha()); }
+
+function moverMes(n){
+  var nuevo = sumarMes(mesVisible, n);
+  if(nuevo < mesMin() || nuevo > mesMax()) return;
+  mesVisible = nuevo;
+  pintarHoja();
+}
+
+/* devuelve los registros de un día concreto para el cliente elegido */
+function lineasDe(fecha){
+  return registros.filter(function(r){
+    return r.fecha === fecha && r.cliId === cliActivo;
+  }).sort(function(a,b){ return a.entrada < b.entrada ? -1 : 1; });
+}
+
+function pintarHoja(){
+  document.getElementById("mes-titulo").textContent = tituloMes(mesVisible);
+  document.getElementById("mes-atras").disabled  = sumarMes(mesVisible,-1) < mesMin();
+  document.getElementById("mes-alante").disabled = sumarMes(mesVisible, 1) > mesMax();
+
+  var hoy = hoyFecha();
+  var dias = diasDelMes(mesVisible);
+  var total = 0, apuntados = 0;
+  var filas = "";
+
+  for(var d = 1; d <= dias; d++){
+    var f = fechaDe(mesVisible, d);
+    var futuro = f > hoy;
+    var lin = lineasDe(f);
+    var minDia = lin.reduce(function(a,r){ return a + (r.minutos||0); }, 0);
+    total += minDia;
+    if(lin.length) apuntados++;
+
+    var clases = "fila" + (esFinde(f) ? " finde" : "") + (f === hoy ? " hoy" : "");
+    var izq = '<span class="c-dia"><span class="n">' + d + '</span>' +
+              '<span class="s">' + nombreDia3(f) + '</span></span>';
+
+    if(lin.length === 0){
+      // día en blanco: se toca y se abre el formulario para añadir
+      filas += '<button class="' + clases + '" ' + (futuro ? "disabled" : "") +
+               ' onclick="abrirDia(\'' + f + '\',null)">' + izq +
+               '<span class="c-hor"><span class="vacio">' +
+               (futuro ? "—" : "Toca para apuntar") + '</span></span>' +
+               '<span class="c-tot"><span class="sin">—</span></span></button>';
+    } else {
+      // primera línea en la fila del día
+      var p = lin[0];
+      filas += '<button class="' + clases + '" onclick="abrirDia(\'' + f + '\',\'' + esc(p.id) + '\')">' +
+               izq + '<span class="c-hor">' + rangoHTML(p) + '</span>' +
+               '<span class="c-tot">' + horasCorto(p.minutos) +
+               (p.validado ? ' <span class="candado">🔒</span>' : '') + '</span></button>';
+      // si ese día tiene más tramos, van debajo indentados
+      for(var i = 1; i < lin.length; i++){
+        var s = lin[i];
+        filas += '<button class="tramo' + (esFinde(f) ? " finde" : "") +
+                 '" onclick="abrirDia(\'' + f + '\',\'' + esc(s.id) + '\')">' +
+                 '<span class="c-hor">' + rangoHTML(s) + '</span>' +
+                 '<span class="c-tot">' + horasCorto(s.minutos) +
+                 (s.validado ? ' <span class="candado">🔒</span>' : '') + '</span></button>';
+      }
+    }
+  }
+
+  document.getElementById("hoja").innerHTML =
+    '<div class="hoja">' +
+      '<div class="hoja-cab"><span class="c-dia">Día</span>' +
+        '<span class="c-hor">Entrada / salida</span>' +
+        '<span class="c-tot">Horas</span></div>' +
+      filas +
+      '<div class="hoja-total"><span class="lab">Total horas</span>' +
+        '<span class="val">' + horasTexto(total) + '</span></div>' +
+    '</div>' +
+    '<p class="pie" style="padding:0 4px 4px">' +
+      (apuntados ? apuntados + (apuntados === 1 ? " día apuntado" : " días apuntados") + " en este mes."
+                 : "Todavía no has apuntado ningún día de este mes.") + '</p>';
+}
+
+function rangoHTML(r){
+  return '<span class="rango">' + esc(r.entrada) + ' – ' + esc(r.salida) + '</span>' +
+         (r.notas ? '<span class="nota">' + esc(r.notas) + '</span>' : '');
+}
+
+/* =========================================================================
+   VENTANA DE UN DÍA
+   ========================================================================= */
+function abrirModal(html){
+  document.getElementById("modal-caja").innerHTML = html;
+  document.getElementById("modal").classList.remove("hide");
+  document.body.classList.add("bloqueado");
+}
+function cerrarModal(){
+  document.getElementById("modal").classList.add("hide");
+  document.body.classList.remove("bloqueado");
+}
+
+function abrirDia(fecha, id){
+  var cl = datos.clientes.filter(function(c){ return c.id === cliActivo; })[0];
+  var reg = id ? registros.filter(function(r){ return r.id === id; })[0] : null;
+
+  if(reg && reg.validado){
+    abrirModal(
+      '<h3>' + esc(fechaLarga(fecha)) + '</h3>' +
+      '<p class="sub">' + esc(cl ? cl.nombre : "") + '</p>' +
+      '<div class="calculo">' + esc(reg.entrada) + ' – ' + esc(reg.salida) +
+        ' · ' + horasTexto(reg.minutos) + '</div>' +
+      '<p style="font-size:.92rem;color:var(--ink-soft);margin-bottom:18px">' +
+        'La oficina ya ha revisado este día, así que no se puede cambiar. ' +
+        'Si hay algún error, avísales.</p>' +
+      '<button class="btn btn-linea" onclick="cerrarModal()">Cerrar</button>'
+    );
+    return;
+  }
+
+  var e = reg ? reg.entrada : "";
+  var s = reg ? reg.salida : "";
+  abrirModal(
+    '<h3>' + esc(fechaLarga(fecha)) + '</h3>' +
+    '<p class="sub">' + esc(cl ? cl.nombre : "") + '</p>' +
+    '<div class="fila2">' +
+      '<div class="campo"><label for="m-entrada">Entrada</label>' +
+        '<input id="m-entrada" type="time" value="' + esc(e) + '" oninput="calcular()"></div>' +
+      '<div class="campo"><label for="m-salida">Salida</label>' +
+        '<input id="m-salida" type="time" value="' + esc(s) + '" oninput="calcular()"></div>' +
+    '</div>' +
+    '<div class="calculo" id="m-calculo">—</div>' +
+    '<div class="campo"><label for="m-notas">Nota (opcional)</label>' +
+      '<input id="m-notas" type="text" maxlength="120" value="' + esc(reg ? (reg.notas||"") : "") + '" ' +
+      'placeholder="Por ejemplo: cristales"></div>' +
+    '<div class="aviso" id="m-aviso"></div>' +
+    '<div class="botonera">' +
+      (reg ? '<button class="btn btn-rojo" onclick="borrarLinea(\'' + esc(reg.id) + '\',this)">Borrar</button>' : '') +
+      '<button class="btn" id="m-guardar" onclick="guardarDia(\'' + fecha + '\',' +
+        (reg ? "'" + esc(reg.id) + "'" : "null") + ',this)">Guardar</button>' +
+    '</div>' +
+    (reg ? '<p style="text-align:center;margin-top:12px">' +
+             '<button class="enlace" onclick="abrirDia(\'' + fecha + '\',null)">Añadir otro tramo a este día</button></p>' : '')
+  );
+  calcular();
+}
+
+function calcular(){
+  var e = document.getElementById("m-entrada"), s = document.getElementById("m-salida");
+  var c = document.getElementById("m-calculo");
+  if(!e || !s || !c) return;
+  if(!e.value || !s.value){ c.textContent = "—"; return; }
+  var m = minutosEntre(e.value, s.value);
+  c.textContent = m ? horasTexto(m) : "Las dos horas son la misma";
+}
+
+async function guardarDia(fecha, id, boton){
+  var e = document.getElementById("m-entrada").value;
+  var s = document.getElementById("m-salida").value;
+  var n = document.getElementById("m-notas").value.trim();
+  var aviso = document.getElementById("m-aviso");
+  if(!e || !s){ aviso.textContent = "Pon la hora de entrada y la de salida."; return; }
+  if(minutosEntre(e, s) === 0){ aviso.textContent = "La entrada y la salida no pueden ser la misma hora."; return; }
+  aviso.textContent = "";
+  boton.disabled = true;
+  try{
+    if(id){
+      await llamar("emp-editar", { id:id, entrada:e, salida:s, notas:n });
+    }else{
+      await llamar("emp-crear", { cliId:cliActivo, fecha:fecha, entrada:e, salida:s, notas:n });
+    }
+    cerrarModal();
+    await refrescarRegistros();
+    pintarHoja();
+    prepararMesesResumen();
+    pintarResumen();
+    avisoBreve("Guardado");
+  }catch(err){
+    aviso.textContent = err.message;
+    boton.disabled = false;
+  }
+}
+
+async function borrarLinea(id, boton){
+  // Borrar es definitivo, así que hace falta pulsar dos veces.
+  if(boton.dataset.seguro !== "1"){
+    boton.dataset.seguro = "1";
+    boton.textContent = "Pulsa otra vez";
+    document.getElementById("m-aviso").textContent = "Se borrarán las horas de este día.";
+    setTimeout(function(){
+      if(boton.dataset.seguro === "1"){
+        boton.dataset.seguro = "";
+        boton.textContent = "Borrar";
+        var a = document.getElementById("m-aviso");
+        if(a) a.textContent = "";
+      }
+    }, 4000);
+    return;
+  }
+  boton.disabled = true;
+  try{
+    await llamar("emp-borrar", { id:id });
+    cerrarModal();
+    await refrescarRegistros();
+    pintarHoja();
+    prepararMesesResumen();
+    pintarResumen();
+    avisoBreve("Borrado");
+  }catch(e){
+    document.getElementById("m-aviso").textContent = e.message;
+    boton.disabled = false;
+  }
+}
+
+/* =========================================================================
+   RESUMEN DEL MES  (todos los clientes juntos)
+   ========================================================================= */
+function prepararMesesResumen(){
+  var sel = document.getElementById("mes-resumen");
+  var anterior = sel.value;
+  var lista = [], m = mesMax();
+  while(m >= mesMin() && lista.length < 12){ lista.push(m); m = sumarMes(m, -1); }
+  sel.innerHTML = lista.map(function(x){
+    return '<option value="' + x + '">' + tituloMes(x) + '</option>';
+  }).join("");
+  sel.value = (anterior && lista.indexOf(anterior) >= 0) ? anterior : mesMax();
+}
+
+function pintarResumen(){
+  var mes = document.getElementById("mes-resumen").value || mesMax();
+  var delMes = registros.filter(function(r){ return mesDe(r.fecha) === mes; });
+  var total = delMes.reduce(function(a,r){ return a + (r.minutos||0); }, 0);
+
+  var porCli = {};
+  delMes.forEach(function(r){
+    var k = r.cliNombre || "Sin cliente";
+    porCli[k] = (porCli[k] || 0) + (r.minutos || 0);
+  });
+
+  document.getElementById("resumen-total").innerHTML =
+    '<div class="total"><div class="lab">Total de ' + esc(tituloMes(mes)) + '</div>' +
+      '<div class="big">' + horasTexto(total) + '</div>' +
+      (Object.keys(porCli).length
+        ? '<div class="porcli">' + Object.keys(porCli).sort().map(function(k){
+            return '<div>' + esc(k) + '<b>' + horasTexto(porCli[k]) + '</b></div>';
+          }).join("") + '</div>'
+        : '') +
+    '</div>';
+
+  if(!delMes.length){
+    document.getElementById("resumen-detalle").innerHTML =
+      '<div class="nada">No hay horas apuntadas en ' + esc(tituloMes(mes)) + '.</div>';
+    return;
+  }
+
+  var orden = delMes.slice().sort(function(a,b){
+    return a.fecha === b.fecha ? (a.entrada < b.entrada ? -1 : 1) : (a.fecha < b.fecha ? -1 : 1);
+  });
+  document.getElementById("resumen-detalle").innerHTML =
+    '<div class="tabla">' + orden.map(function(r){
+      return '<div class="f' + (esFinde(r.fecha) ? " finde" : "") + '">' +
+        '<span><span class="d">' + esc(nombreDia3(r.fecha)) + ' ' + aDate(r.fecha).getUTCDate() + '</span> · ' +
+        esc(r.cliNombre || "") + '<br><span style="font-size:.84rem;color:var(--ink-soft)">' +
+        esc(r.entrada) + ' – ' + esc(r.salida) + '</span></span>' +
+        '<b>' + horasTexto(r.minutos) + '</b></div>';
+    }).join("") + '</div>';
+}
+
+/* =========================================================================
+   CONTRASEÑA
+   ========================================================================= */
+function abrirClave(){
+  abrirModal(
+    '<h3>Cambiar mi contraseña</h3>' +
+    '<p class="sub">Elige una que recuerdes con facilidad.</p>' +
+    '<div class="campo"><label for="c-actual">Contraseña actual</label>' +
+      '<input id="c-actual" type="password" autocomplete="current-password"></div>' +
+    '<div class="campo"><label for="c-nueva">Contraseña nueva</label>' +
+      '<input id="c-nueva" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres"></div>' +
+    '<div class="aviso" id="c-aviso"></div>' +
+    '<div class="botonera">' +
+      '<button class="btn btn-linea" onclick="cerrarModal()">Cancelar</button>' +
+      '<button class="btn" onclick="guardarClave(this)">Guardar</button>' +
+    '</div>'
+  );
+}
+
+async function guardarClave(boton){
+  var a = document.getElementById("c-actual").value;
+  var n = document.getElementById("c-nueva").value;
+  var aviso = document.getElementById("c-aviso");
+  if(!a || !n){ aviso.textContent = "Rellena las dos casillas."; return; }
+  if(n.length < 6){ aviso.textContent = "La nueva debe tener al menos 6 caracteres."; return; }
+  boton.disabled = true;
+  try{
+    await llamar("emp-clave", { actual:a, nueva:n });
+    cerrarModal();
+    avisoBreve("Contraseña cambiada");
+  }catch(e){ aviso.textContent = e.message; boton.disabled = false; }
+}
+
+/* =========================================================================
+   AYUDAS
+   ========================================================================= */
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+  return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+}); }
+
+function horasTexto(min){
+  min = Math.round(min || 0);
+  var h = Math.floor(min/60), m = min % 60;
+  if(h && m) return h + " h " + m + " min";
+  if(h) return h + " h";
+  if(m) return m + " min";
+  return "0 h";
+}
+/* versión corta para la columna estrecha de la hoja */
+function horasCorto(min){
+  min = Math.round(min || 0);
+  var h = Math.floor(min/60), m = min % 60;
+  if(h && m) return h + " h " + m;
+  if(h) return h + " h";
+  if(m) return m + " min";
+  return "—";
+}
+/* si la salida es menor que la entrada se entiende que es turno de noche */
+function minutosEntre(e, s){
+  var a = e.split(":"), b = s.split(":");
+  var m1 = (+a[0])*60 + (+a[1]), m2 = (+b[0])*60 + (+b[1]);
+  var d = m2 - m1;
+  if(d < 0) d += 24*60;
+  return d;
+}
+
+var tToast;
+function avisoBreve(texto){
+  var t = document.getElementById("toast");
+  t.textContent = texto;
+  t.classList.add("ver");
+  clearTimeout(tToast);
+  tToast = setTimeout(function(){ t.classList.remove("ver"); }, 2600);
+}
+
+/* =========================================================================
+   ARRANQUE
+   ========================================================================= */
+document.getElementById("clave").addEventListener("keydown", function(ev){
+  if(ev.key === "Enter") entrar();
+});
+document.getElementById("usuario").addEventListener("keydown", function(ev){
+  if(ev.key === "Enter") document.getElementById("clave").focus();
+});
+
+(async function(){
+  if(!token) return;
+  try{
+    var j = await llamar("sesion", {});
+    aplicarDatos(j);
+    document.getElementById("login").classList.add("hide");
+    document.getElementById("app").classList.remove("hide");
+    await cargarHoras();
+  }catch(e){ /* la sesión no vale: se queda la pantalla de entrar */ }
+})();
+</script>
+</body>
+</html>
