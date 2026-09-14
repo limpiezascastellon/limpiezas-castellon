@@ -1,0 +1,75 @@
+---
+layout: base.njk
+permalink: /zonas/index.html
+nav: zonas
+title: "Zonas de servicio | Limpieza en Castellón y alrededores"
+description: "Damos servicio de limpieza en Castellón de la Plana, el Grao, Vila-real, Onda y Benicàssim, con equipos propios y desplazamiento incluido. Presupuesto en 24h."
+migas:
+  - nombre: "Zonas de servicio"
+faq:
+  - q: "¿Trabajáis fuera de estas cinco poblaciones?"
+    a: "Como norma, no. Preferimos decir que no antes que aceptar un edificio al que no podríamos llegar con garantías de horario. Si tu población está muy cerca de alguna de las cinco, llámanos y lo valoramos."
+  - q: "¿Cobráis desplazamiento?"
+    a: "No en los servicios periódicos: el desplazamiento va incluido en el precio del presupuesto dentro de estas cinco poblaciones. En trabajos puntuales se valora cada caso y siempre se indica antes."
+  - q: "¿Por qué tan pocas poblaciones?"
+    a: "Porque la limpieza de comunidades y oficinas depende de la puntualidad. Concentrando las rutas podemos cumplir horarios, cubrir bajas el mismo día y pasarnos a ver el edificio cuando hace falta."
+---
+
+<div class="phead">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Ruta de navegación"><a href="/">Inicio</a> / <b>Zonas de servicio</b></nav>
+    <h1>Dónde damos servicio de limpieza</h1>
+    <p>Trabajamos con equipos propios en cinco poblaciones de la provincia de Castellón. Ni una más, y es a propósito.</p>
+  </div>
+</div>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Nuestra zona</span>
+      <h2>Cinco poblaciones, cobertura real</h2>
+      <p>Una empresa de limpieza que promete llegar a media provincia acaba llegando tarde a todas partes. Nosotros cubrimos un radio corto para poder cumplir los horarios, sustituir a una persona el mismo día si falla y pasarnos a revisar el edificio cuando hace falta.</p>
+    </div>
+    <div class="cards3">
+      <a class="fcard reveal" href="/servicios" style="display:block">
+        <div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h3>Castellón de la Plana</h3>
+        <p>Nuestra base. Comunidades del centro y del ensanche, oficinas, despachos profesionales y locales comerciales.</p>
+      </a>
+      {%- for z in zonas %}
+      <a class="fcard reveal" href="/{{ z.slug }}" style="display:block">
+        <div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h3>{{ z.nombreCorto }}</h3>
+        <p>{{ z.lead }}</p>
+      </a>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-cloud">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Dudas habituales</span>
+      <h2>Preguntas frecuentes sobre la zona de trabajo</h2>
+    </div>
+    <div class="faq reveal">
+      {%- for f in faq %}
+      <details{% if loop.first %} open{% endif %}>
+        <summary>{{ f.q }}</summary>
+        <div class="ans"><p>{{ f.a }}</p></div>
+      </details>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap reveal">
+    <div class="ctaband">
+      <h2>¿Tu edificio está en alguna de estas poblaciones?</h2>
+      <p>Entonces podemos ayudarte. Pide presupuesto y te respondemos en menos de 24 horas.</p>
+      <a class="btn btn-dark" href="/contacto">Pedir presupuesto</a>
+    </div>
+  </div>
+</section>

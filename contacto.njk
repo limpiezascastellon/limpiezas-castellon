@@ -1,0 +1,86 @@
+---
+layout: base.njk
+permalink: /contacto/index.html
+nav: contacto
+title: "Contacto y presupuesto gratis | Limpiezas Castellón"
+description: "Pide presupuesto de limpieza para tu comunidad, oficina o local en Castellón, Grao, Vila-real, Onda o Benicàssim. Respuesta en menos de 24h. Tel. 964 900 046."
+migas:
+  - nombre: "Contacto"
+---
+
+<div class="phead">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Ruta de navegación"><a href="/">Inicio</a> / <b>Contacto</b></nav>
+    <h1>Pide tu presupuesto de limpieza</h1>
+    <p>Cuéntanos qué hay que limpiar y con qué frecuencia. Te respondemos en menos de 24 horas laborables.</p>
+  </div>
+</div>
+
+<section class="sec">
+  <div class="wrap contact-grid">
+    <div class="reveal">
+      <span class="eyebrow">Hablemos</span>
+      <h2 style="font-size:clamp(1.7rem,3.5vw,2.3rem);margin:14px 0 22px">Estamos a una llamada de distancia</h2>
+      <div class="cinfo">
+        <div class="citem"><div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div><b>Teléfono</b><a href="tel:{{ site.telefonoLink }}">{{ site.telefono }}</a></div></div>
+        <div class="citem"><div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></div><div><b>Email</b><a href="mailto:{{ site.email }}">{{ site.email }}</a></div></div>
+        <div class="citem"><div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><b>Dirección</b><span>{{ site.direccion }}</span></div></div>
+        <div class="citem"><div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><b>Horario de oficina</b><span>{{ site.horario }}</span></div></div>
+      </div>
+      <div class="map-box reveal" style="margin-top:18px">
+        <div class="pin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><b style="font-family:var(--d)">{{ site.calle }} · {{ site.localidad }}</b></div>
+      </div>
+      <p style="margin-top:18px;color:var(--ink-soft);font-size:.96rem">Damos servicio en Castellón de la Plana, {% for z in zonas %}{{ z.nombre }}{% if loop.revindex0 == 1 %} y {% elif not loop.last %}, {% endif %}{% endfor %}.</p>
+    </div>
+
+    <div class="form reveal">
+      <h2 style="font-size:1.5rem;margin-bottom:6px">Presupuesto gratis y sin compromiso</h2>
+      <p class="sub">Rellena el formulario y te respondemos en menos de 24h.</p>
+      <div id="formMsg" role="status" aria-live="polite" style="display:none;padding:13px 16px;border-radius:12px;margin-bottom:16px;font-weight:600"></div>
+      <div class="fgrid">
+        <div class="field"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" type="text" autocomplete="name" placeholder="Tu nombre"></div>
+        <div class="field"><label for="f-telefono">Teléfono</label><input id="f-telefono" name="telefono" type="tel" autocomplete="tel" placeholder="600 000 000"></div>
+      </div>
+      <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="tucorreo@email.com"></div>
+      <div class="field"><label for="f-servicio">¿Qué hay que limpiar?</label>
+        <select id="f-servicio" name="servicio">
+          <option>Comunidad de propietarios</option>
+          <option>Oficina o despacho</option>
+          <option>Local comercial</option>
+          <option>Garaje o parking</option>
+          <option>Cristales</option>
+          <option>Otro servicio</option>
+        </select>
+      </div>
+      <div class="field"><label for="f-poblacion">Población</label>
+        <select id="f-poblacion" name="poblacion">
+          <option>Castellón de la Plana</option>
+          {%- for z in zonas %}
+          <option>{{ z.nombreCorto }}</option>
+          {%- endfor %}
+        </select>
+      </div>
+      <div class="field"><label for="f-mensaje">Mensaje</label><textarea id="f-mensaje" name="mensaje" placeholder="Número de alturas, metros aproximados, frecuencia que te interesa..."></textarea></div>
+      <!-- Campo trampa antispam: invisible para personas, lo rellenan los bots -->
+      <input id="f-web" name="web" type="text" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+      <div class="checkbox"><input id="f-acepto" type="checkbox"><label for="f-acepto">He leído y acepto la <a href="/politica-de-privacidad" style="color:var(--brand);text-decoration:underline">política de privacidad</a>.</label></div>
+      <button id="f-enviar" class="btn btn-primary" style="width:100%;justify-content:center" onclick="enviarPresupuesto()">Enviar solicitud</button>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-cloud">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Zonas de servicio</span>
+      <h2>Dónde damos servicio</h2>
+      <p>Trabajamos con equipos propios en estas cinco poblaciones.</p>
+    </div>
+    <div class="zonelinks reveal">
+      <a href="/servicios">Castellón de la Plana</a>
+      {%- for z in zonas %}
+      <a href="/{{ z.slug }}">{{ z.nombreCorto }}</a>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
