@@ -1,0 +1,35 @@
+---
+permalink: /sitemap.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{{ site.url }}/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  {%- set paginas = ["/servicios", "/limpieza-de-comunidades-castellon", "/limpieza-de-oficinas-castellon", "/zonas", "/nosotros", "/contacto", "/blog"] %}
+  {%- for p in paginas %}
+  <url>
+    <loc>{{ site.url }}{{ p }}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  {%- endfor %}
+  {%- for z in zonas %}
+  <url>
+    <loc>{{ site.url }}/{{ z.slug }}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  {%- endfor %}
+  {%- for post in collections.blog %}
+  <url>
+    <loc>{{ site.url }}/blog/{{ post.fileSlug }}</loc>
+    <lastmod>{{ post.date | fechaISO }}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  {%- endfor %}
+</urlset>
