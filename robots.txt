@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Zonas privadas (panel interno, no deben indexarse)
+Disallow: /admin/
+Disallow: /admin-presupuestos
+Disallow: /horas
+Disallow: /api/
+
+Sitemap: https://www.limpiezascastellon.es/sitemap.xml
