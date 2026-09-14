@@ -15,7 +15,7 @@ module.exports = {
   // Ajústalas con las exactas de tu oficina (Google Maps > clic derecho > copiar coordenadas).
   lat: "39.98639",
   lng: "-0.05130",
-  horario: "Lunes a viernes · 9:00 – 18:00",
+  horario: "Lunes a viernes · 9:00 – 19:00",
   anios: "28",
   url: "https://www.limpiezascastellon.es",
   whatsapp: "https://wa.me/34964900046",
