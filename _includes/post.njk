@@ -1,0 +1,56 @@
+---
+layout: base.njk
+ogType: article
+nav: blog
+---
+{%- set canonicalPost = site.url + "/blog/" + page.fileSlug -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "@id": {{ (canonicalPost + "#articulo") | dump | safe }},
+  "headline": {{ title | dump | safe }},
+  "description": {{ description | dump | safe }},
+  {% if imagen %}"image": {{ (site.url + imagen) | dump | safe }},{% endif %}
+  "datePublished": {{ (date | fechaISO) | dump | safe }},
+  "dateModified": {{ (date | fechaISO) | dump | safe }},
+  "inLanguage": "es-ES",
+  "mainEntityOfPage": { "@type": "WebPage", "@id": {{ canonicalPost | dump | safe }} },
+  "author": { "@type": "Organization", "name": {{ site.nombre | dump | safe }}, "url": {{ (site.url + "/") | dump | safe }} },
+  "publisher": { "@id": {{ (site.url + "/#empresa") | dump | safe }} }
+}
+</script>
+
+<div class="phead">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Ruta de navegación"><a href="/">Inicio</a> / <a href="/blog">Blog</a> / <b>{{ title }}</b></nav>
+    {% if categoria %}<span class="cat" style="display:inline-block;position:static;background:var(--fresh);color:#04231f;margin-bottom:14px">{{ categoria }}</span>{% endif %}
+    <h1>{{ title }}</h1>
+  </div>
+</div>
+
+<section class="sec">
+  <div class="wrap">
+    {% if imagen %}<img class="post-cover" src="{{ imagen }}" alt="{{ title }}" width="1200" height="675" fetchpriority="high" decoding="async">{% endif %}
+    <p class="post-meta">Publicado el <time datetime="{{ date | fechaISO }}">{{ date | fechaLegible }}</time>{% if autor %} · por {{ autor }}{% endif %}</p>
+    <div class="post-body">
+      {{ content | safe }}
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-cloud">
+  <div class="wrap reveal">
+    <div class="ctaband">
+      <h2>¿Necesitas limpieza profesional en Castellón?</h2>
+      <p>Aplica estos consejos o déjalo en nuestras manos. Presupuesto sin compromiso en menos de 24 horas.</p>
+      <a class="btn btn-dark" href="/contacto">Pedir presupuesto</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap" style="text-align:center">
+    <a class="btn btn-dark" href="/blog">Ver todos los artículos</a>
+  </div>
+</section>
