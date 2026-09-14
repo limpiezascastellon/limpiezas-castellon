@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-label="Garaje comunitario con plazas de aparcamiento">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F4F9FD"/>
+      <stop offset="1" stop-color="#E3EEF7"/>
+    </linearGradient>
+    <linearGradient id="suelo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DCE8F2"/>
+      <stop offset="1" stop-color="#CBDCEB"/>
+    </linearGradient>
+    <linearGradient id="carroceria" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B62B0"/>
+      <stop offset="1" stop-color="#0A3A6E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo y techo -->
+  <rect width="1200" height="600" fill="url(#fondo)"/>
+  <rect x="0" y="0" width="1200" height="74" fill="#E7F0F8"/>
+  <rect x="0" y="70" width="1200" height="10" fill="#D3E2EF"/>
+  <!-- Luminarias -->
+  <g fill="#FFFFFF" opacity=".95">
+    <rect x="215" y="80" width="150" height="15" rx="7"/>
+    <rect x="835" y="80" width="150" height="15" rx="7"/>
+  </g>
+  <g fill="#F4B740" opacity=".18">
+    <path d="M215 95h150l52 70H163z"/>
+    <path d="M835 95h150l52 70H783z"/>
+  </g>
+
+  <!-- Pared del fondo -->
+  <rect x="0" y="80" width="1200" height="290" fill="#EDF4FA"/>
+  <rect x="0" y="360" width="1200" height="12" fill="#D9E6F1"/>
+
+  <!-- Cartel de parking -->
+  <g>
+    <rect x="536" y="128" width="128" height="128" rx="26" fill="#0E5AA7"/>
+    <path d="M578 158h28a30 30 0 0 1 0 60h-12v28h-16zm16 16v28h12a14 14 0 0 0 0-28z" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Columnas -->
+  <g>
+    <rect x="118" y="80" width="62" height="292" fill="#DCE8F2"/>
+    <rect x="118" y="80" width="16" height="292" fill="#E9F2F9"/>
+    <rect x="118" y="268" width="62" height="34" fill="#F4B740"/>
+    <rect x="1020" y="80" width="62" height="292" fill="#DCE8F2"/>
+    <rect x="1020" y="80" width="16" height="292" fill="#E9F2F9"/>
+    <rect x="1020" y="268" width="62" height="34" fill="#F4B740"/>
+  </g>
+
+  <!-- Suelo -->
+  <rect x="0" y="372" width="1200" height="228" fill="url(#suelo)"/>
+
+  <!-- Plazas pintadas -->
+  <g stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" opacity=".92">
+    <path d="M78 600 176 404"/>
+    <path d="M330 600 386 404"/>
+    <path d="M620 600 620 404"/>
+    <path d="M870 600 814 404"/>
+    <path d="M1122 600 1024 404"/>
+    <path d="M168 404h864"/>
+  </g>
+
+  <!-- Coche aparcado -->
+  <g transform="translate(408 300)">
+    <ellipse cx="192" cy="248" rx="205" ry="24" fill="#0A3A6E" opacity=".12"/>
+    <path d="M42 200c-16 0-28-12-28-27v-30c0-16 11-29 27-32l66-12 44-40c14-13 32-20 51-20h80c20 0 39 8 53 23l38 40 44 11c17 4 29 19 29 36v24c0 15-13 27-28 27z" fill="url(#carroceria)"/>
+    <path d="M168 84c7-7 17-11 27-11h44c11 0 21 4 29 12l30 32H139z" fill="#CFE6F8"/>
+    <path d="M113 117l40-38c-9 1-18 5-25 11l-32 27z" fill="#CFE6F8" opacity=".75"/>
+    <rect x="14" y="146" width="66" height="16" rx="8" fill="#F4B740"/>
+    <rect x="310" y="146" width="62" height="16" rx="8" fill="#F26A5A"/>
+    <path d="M152 129h96" stroke="#0A3A6E" stroke-width="6" stroke-linecap="round" opacity=".35"/>
+    <g fill="#16324A">
+      <circle cx="110" cy="200" r="42"/>
+      <circle cx="300" cy="200" r="42"/>
+    </g>
+    <g fill="#E4EEF6">
+      <circle cx="110" cy="200" r="19"/>
+      <circle cx="300" cy="200" r="19"/>
+    </g>
+  </g>
+
+  <!-- Cubo de fregado con la fregona dentro -->
+  <g transform="translate(908 404)">
+    <path d="M64 70V-96" stroke="#B7C8D6" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="64" cy="-96" r="8" fill="#9FB6C7"/>
+    <path d="M12 26h104l-12 92a14 14 0 0 1-14 12H38a14 14 0 0 1-14-12z" fill="#16C2B0"/>
+    <path d="M12 26h30l-9 104H38a14 14 0 0 1-14-12z" fill="#0E9C8E" opacity=".35"/>
+    <rect x="4" y="10" width="120" height="22" rx="11" fill="#0E9C8E"/>
+  </g>
+</svg>
