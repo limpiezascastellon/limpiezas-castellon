@@ -27,9 +27,6 @@ migas:
         <div class="citem"><div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><b>Dirección</b><span>{{ site.direccion }}</span></div></div>
         <div class="citem"><div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><b>Horario de oficina</b><span>{{ site.horario }}</span></div></div>
       </div>
-      <div class="map-box reveal" style="margin-top:18px">
-        <div class="pin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><b style="font-family:var(--d)">{{ site.calle }} · {{ site.localidad }}</b></div>
-      </div>
       <p style="margin-top:18px;color:var(--ink-soft);font-size:.96rem">Damos servicio en Castellón de la Plana, {% for z in zonas %}{{ z.nombre }}{% if loop.revindex0 == 1 %} y {% elif not loop.last %}, {% endif %}{% endfor %}.</p>
     </div>
 
