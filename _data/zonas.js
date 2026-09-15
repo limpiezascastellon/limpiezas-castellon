@@ -13,7 +13,7 @@ module.exports = [
       "Limpieza de comunidades de propietarios, locales y oficinas en el Grao de Castellón. Presupuesto gratis en 24h y personal asegurado. Llama al 964 900 046.",
     h1: "Empresa de limpieza en el Grao de Castellón",
     lead:
-      "Limpiamos comunidades de propietarios, apartamentos turísticos, locales y oficinas del Grao, con la frecuencia que cada edificio necesita.",
+      "Limpiamos comunidades de propietarios, locales y oficinas del Grao, con la frecuencia que cada cliente necesita.",
     intro: [
       "El Grao tiene una exigencia que no tienen los edificios de interior: la arena, el salitre y la humedad del mar. Los portales acumulan arena todo el año, las barandillas y los cristales se cubren de sal y las zonas comunes exteriores sufren mucho más que en el centro de Castellón.",
       "Por eso, en las comunidades del Grao no planteamos el mismo servicio que en un edificio del centro. Ajustamos la frecuencia de barrido y fregado de portales, reforzamos la limpieza en temporada alta y usamos productos adecuados para superficies expuestas al ambiente marino.",
