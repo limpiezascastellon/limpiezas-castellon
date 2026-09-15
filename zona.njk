@@ -1,0 +1,123 @@
+---
+layout: base.njk
+nav: zonas
+pagination:
+  data: zonas
+  size: 1
+  alias: zona
+permalink: "/{{ zona.slug }}/index.html"
+migas:
+  - nombre: "Zonas de servicio"
+    url: "/zonas"
+---
+
+<div class="phead">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Ruta de navegación"><a href="/">Inicio</a> / <a href="/zonas">Zonas</a> / <b>{{ zona.nombreCorto }}</b></nav>
+    <h1>{{ zona.h1 }}</h1>
+    <p>{{ zona.lead }}</p>
+  </div>
+</div>
+
+<section class="sec">
+  <div class="wrap zone-grid">
+    <div class="zone-txt reveal">
+      <span class="eyebrow">Limpieza en {{ zona.nombreCorto }}</span>
+      <h2>Así trabajamos en {{ zona.nombre }}</h2>
+      {%- for p in zona.intro %}
+      <p>{{ p }}</p>
+      {%- endfor %}
+      <ul class="tick" style="margin:26px 0">
+        {%- for punto in zona.puntos %}
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> {{ punto }}</li>
+        {%- endfor %}
+      </ul>
+      <p>{{ zona.cierre }}</p>
+      <div class="hero-cta" style="margin-top:26px">
+        <a class="btn btn-primary" href="/contacto">Pedir presupuesto</a>
+        <a class="btn btn-dark" href="tel:{{ site.telefonoLink }}">Llamar al {{ site.telefonoCorto }}</a>
+      </div>
+    </div>
+
+    <aside class="zone-aside reveal">
+      <h3>Servicio en {{ zona.nombreCorto }}</h3>
+      <img src="/img/ilustraciones/comunidades-vecinos-43.webp" alt="Limpieza de comunidades y oficinas en {{ zona.nombre }}" width="1200" height="900" loading="lazy" decoding="async" style="border-radius:16px;margin-bottom:18px">
+      <div class="zdata">
+        <div><b>Población</b>{{ zona.nombreCorto }} ({{ zona.cp }})</div>
+        <div><b>Distancia</b>{{ zona.distancia }}</div>
+        <div><b>Respuesta</b>Presupuesto en menos de 24h</div>
+        <div><b>Desplazamiento</b>Incluido en los servicios periódicos</div>
+      </div>
+      <a class="btn btn-primary" href="/contacto">Pide presupuesto gratis</a>
+    </aside>
+  </div>
+</section>
+
+<section class="sec sec-cloud">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Servicios</span>
+      <h2>Qué limpiamos en {{ zona.nombreCorto }}</h2>
+      <p>Los mismos servicios que en Castellón capital, con el mismo equipo y las mismas garantías.</p>
+    </div>
+    <div class="cards3">
+      <a class="fcard reveal" href="/limpieza-de-comunidades-castellon" style="display:block">
+        <div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M6 21V8l6-5 6 5v13"/></svg></div>
+        <h3>Comunidades de propietarios</h3>
+        <p>Portales, escaleras, ascensores, garajes y zonas comunes, con la frecuencia que necesite el edificio.</p>
+      </a>
+      <a class="fcard reveal" href="/limpieza-de-oficinas-castellon" style="display:block">
+        <div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg></div>
+        <h3>Oficinas y despachos</h3>
+        <p>Limpieza antes de abrir o después de cerrar, con reposición de consumibles incluida.</p>
+      </a>
+      <a class="fcard reveal" href="/servicios" style="display:block">
+        <div class="fic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v13H3z"/><path d="M7 7V4h10v3"/></svg></div>
+        <h3>Locales, cristales y garajes</h3>
+        <p>Comercios, escaparates, cristalería y baldeo de garajes comunitarios con maquinaria.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Dudas habituales</span>
+      <h2>Preguntas frecuentes sobre nuestro servicio en {{ zona.nombreCorto }}</h2>
+    </div>
+    <div class="faq reveal">
+      {%- for f in zona.faq %}
+      <details{% if loop.first %} open{% endif %}>
+        <summary>{{ f.q }}</summary>
+        <div class="ans"><p>{{ f.a }}</p></div>
+      </details>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-cloud">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Otras poblaciones</span>
+      <h2>Dónde más trabajamos</h2>
+    </div>
+    <div class="zonelinks reveal">
+      <a href="/servicios">Castellón de la Plana</a>
+      {%- for z in zonas %}
+      <a href="/{{ z.slug }}"{% if z.slug == zona.slug %} aria-current="page"{% endif %}>{{ z.nombreCorto }}</a>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap reveal">
+    <div class="ctaband">
+      <h2>Presupuesto de limpieza en {{ zona.nombreCorto }}</h2>
+      <p>Visitamos el edificio, lo valoramos y te damos un precio por escrito en menos de 24 horas.</p>
+      <a class="btn btn-dark" href="/contacto">Pedir presupuesto</a>
+    </div>
+  </div>
+</section>
